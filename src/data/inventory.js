@@ -1,0 +1,87 @@
+export const initialStockMovements = [
+  {
+    id: "MOV-2026-001",
+    date: "2026-03-01T10:15:00Z",
+    productId: "PROD-001",
+    productName: "Embroidered Rayon Anarkali Kurta",
+    sku: "SKU-KUR-001",
+    type: "Stock In",
+    quantity: 60,
+    previousStock: 10,
+    newStock: 70,
+    reason: "Received PO Goods Delivery",
+    referenceId: "PO-2026-001",
+    performedBy: "Store Manager"
+  },
+  {
+    id: "MOV-2026-002",
+    date: "2026-03-02T14:30:00Z",
+    productId: "PROD-003",
+    productName: "Wireless Bluetooth 5.3 Neckband",
+    sku: "SKU-AUD-003",
+    type: "Stock In",
+    quantity: 120,
+    previousStock: 15,
+    newStock: 135,
+    reason: "Vendor Bulk Stock Replenishment",
+    referenceId: "PO-2026-003",
+    performedBy: "Store Manager"
+  },
+  {
+    id: "MOV-2026-003",
+    date: "2026-03-04T11:00:00Z",
+    productId: "PROD-007",
+    productName: "Stainless Steel 2-Tier Kitchen Spice Rack",
+    sku: "SKU-KIT-007",
+    type: "Damage / Loss",
+    quantity: -2,
+    previousStock: 8,
+    newStock: 6,
+    reason: "Transit dent found during shelf audit",
+    referenceId: "AUDIT-MAR-01",
+    performedBy: "Quality Inspector"
+  },
+  {
+    id: "MOV-2026-004",
+    date: "2026-03-05T16:45:00Z",
+    productId: "PROD-004",
+    productName: "100% Glace Cotton King Size Bedsheet",
+    sku: "SKU-BED-004",
+    type: "Return Restock",
+    quantity: 1,
+    previousStock: 13,
+    newStock: 14,
+    reason: "Customer Return verified in pristine condition",
+    referenceId: "RET-2026-001",
+    performedBy: "Returns Team"
+  },
+  {
+    id: "MOV-2026-005",
+    date: "2026-03-05T18:10:00Z",
+    productId: "PROD-006",
+    productName: "Men's Slim Fit Stretchable Casual Chinos Trousers",
+    sku: "SKU-MEN-006",
+    type: "Return Restock",
+    quantity: 1,
+    previousStock: 49,
+    newStock: 50,
+    reason: "RTO return verified intact and restocked",
+    referenceId: "RTO-2026-001",
+    performedBy: "Returns Team"
+  },
+  {
+    id: "MOV-2026-006",
+    date: "2026-03-06T09:30:00Z",
+    productId: "PROD-011",
+    productName: "Traditional Handcrafted Kolhapuri Block Heel Sandals",
+    sku: "SKU-FTW-011",
+    type: "Manual Adjustment",
+    quantity: 0,
+    previousStock: 0,
+    newStock: 0,
+    reason: "Stock audit confirmed complete stock-out pending supplier dispatch",
+    referenceId: "AUDIT-MAR-02",
+    performedBy: "Store Manager"
+  }
+];
+
