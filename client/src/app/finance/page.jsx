@@ -440,7 +440,7 @@ export default function FinancePage() {
       />
 
       {/* KPI Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-3 sm:gap-4">
         <StatCard
           title="Gross Sales"
           value={formatCurrency(metrics.totalSales)}
