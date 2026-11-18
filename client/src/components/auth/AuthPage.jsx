@@ -62,7 +62,7 @@ export default function AuthPage({ mode }) {
   return (
     <main className="flex min-h-[100dvh] items-center justify-center px-4 py-8 sm:px-8">
       <div
-        className="grid w-full max-w-5xl overflow-hidden rounded-[28px] lg:min-h-[640px] lg:grid-cols-[0.95fr_1.05fr]"
+        className="sd-auth-card grid w-full max-w-5xl overflow-hidden rounded-[28px] lg:min-h-[640px] lg:grid-cols-[0.95fr_1.05fr]"
         style={{
           backgroundColor: "var(--bg-surface)",
           border: "1px solid var(--border)",
@@ -70,11 +70,8 @@ export default function AuthPage({ mode }) {
         }}
       >
         <aside
-          className="relative hidden flex-col justify-between overflow-hidden p-10 text-white lg:flex xl:p-12"
-          style={{
-            background:
-              "radial-gradient(circle at 75% 15%, rgba(96,165,250,.32), transparent 34%), linear-gradient(145deg, #101d35 0%, #0a1222 100%)",
-          }}
+          className="sd-auth-panel relative hidden flex-col justify-between overflow-hidden p-10 text-white lg:flex xl:p-12"
+          style={{ background: "var(--auth-panel-bg)" }}
         >
           <div
             aria-hidden="true"
@@ -85,10 +82,13 @@ export default function AuthPage({ mode }) {
             className="absolute -bottom-16 -left-8 h-56 w-56 rounded-full border border-white/10"
           />
           <Link href="/" className="relative inline-flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500 text-white shadow-lg shadow-blue-500/30">
+            <span
+              className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-500 text-white shadow-lg shadow-blue-500/30"
+              style={{ backgroundColor: "var(--auth-logo-bg)" }}
+            >
               <StorefrontIcon sx={{ fontSize: 24 }} />
             </span>
-            <span className="text-lg font-bold tracking-tight">SellerDesk</span>
+            <span className="sd-wordmark text-lg font-bold tracking-tight">SellerDesk</span>
           </Link>
 
           <div className="relative my-12">
@@ -240,8 +240,8 @@ export default function AuthPage({ mode }) {
 
               <button
                 type="submit"
-                className="flex min-h-12 w-full items-center justify-center rounded-xl px-5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-600/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
-                style={{ background: "linear-gradient(100deg, #2563eb, #3b82f6)" }}
+                className="sd-auth-cta flex min-h-12 w-full items-center justify-center rounded-xl px-5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-600/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+                style={{ background: "var(--auth-cta-bg)", color: "var(--auth-cta-text)" }}
               >
                 {content.button}
               </button>

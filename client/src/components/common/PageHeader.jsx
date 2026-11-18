@@ -29,7 +29,7 @@ export default function PageHeader({
             <React.Fragment key={idx}>
               <ChevronRightIcon
                 sx={{ fontSize: 16 }}
-                style={{ color: "#4caf50" }}
+                style={{ color: "var(--breadcrumb-sep)" }}
               />
               {crumb.href ? (
                 <Link
@@ -56,7 +56,7 @@ export default function PageHeader({
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <h1
-              className="text-xl sm:text-2xl font-bold tracking-tight"
+              className="sd-page-title text-xl sm:text-2xl font-bold tracking-tight"
               style={{ color: "var(--text-primary)" }}
             >
               {title}

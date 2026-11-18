@@ -630,7 +630,7 @@ export default function ShippingReturnsPage() {
               size="small"
               startIcon={<FileDownloadIcon />}
               onClick={handleExport}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Export {currentTab === 0 ? "Shipments" : currentTab === 1 ? "Returns" : "RTO"} CSV
             </Button>

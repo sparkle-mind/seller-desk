@@ -3,138 +3,517 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════════
-   DESIGN TOKEN SYSTEM — all UI colours reference these variables.
+   DESIGN TOKEN SYSTEM: all UI colours reference these variables.
    Light tokens are the default; .dark overrides flip every token.
-   ThemeContext also writes these at runtime (palette + mode aware).
+   ThemeContext also writes the palette tokens at runtime.
+
+   LIGHT MODE = "Lapels" design language: linen page, ivory cards,
+   espresso ink, tailored olive primary, bronze accent, serif display
+   type, hairline warm borders and quiet elevation.
+   DARK MODE  = the original SellerDesk midnight design (unchanged).
 ═══════════════════════════════════════════════════════════════════ */
 :root {
   /* Surface */
-  --bg-base:       #f4f7fb;   /* page background */
-  --bg-surface:    #ffffff;   /* card / panel */
-  --bg-surface2:   #f8fafc;   /* inset / subtle surface */
-  --bg-surface3:   #f1f5f9;   /* deepest inset */
+  --bg-base:       #f3eee5;   /* page background (linen) */
+  --bg-surface:    #fbf9f4;   /* card / panel (ivory) */
+  --bg-surface2:   #f6f1e8;   /* inset / subtle surface */
+  --bg-surface3:   #ede6d9;   /* deepest inset */
 
   /* Border */
-  --border:        #e2e8f0;
-  --border-subtle: #eef2f7;
+  --border:        #e0d6c5;
+  --border-subtle: #ece5d8;
+  --border-strong: #cbbfa9;
 
   /* Text */
-  --text-primary:   #0f172a;
-  --text-secondary: #475569;
-  --text-tertiary:  #94a3b8;
+  --text-primary:   #2a251f;
+  --text-secondary: #5a5145;
+  --text-tertiary:  #776c5c;
 
-  /* Brand — Ocean / blue defaults (overwritten at runtime) */
-  --brand:          #2563eb;
-  --brand-rgb:      37 99 235;
-  --brand-contrast: #ffffff;
-  --brand-text:     #1d4ed8;
-  --brand-soft:     rgba(37, 99, 235, 0.10);
-  --brand-soft-strong: rgba(37, 99, 235, 0.15);
-  --brand-border:   rgba(37, 99, 235, 0.26);
-  --brand-ring:     rgba(37, 99, 235, 0.18);
-  --brand-glow:     rgba(37, 99, 235, 0.22);
+  /* Brand: Lapels olive defaults (overwritten at runtime per palette) */
+  --brand:          #3d4535;
+  --brand-rgb:      61 69 53;
+  --brand-contrast: #fbf9f4;
+  --brand-text:     #2b3125;
+  --brand-soft:     rgba(61, 69, 53, 0.08);
+  --brand-soft-strong: rgba(61, 69, 53, 0.14);
+  --brand-border:   rgba(61, 69, 53, 0.28);
+  --brand-ring:     rgba(61, 69, 53, 0.16);
+  --brand-glow:     rgba(42, 37, 31, 0.18);
 
-  --brand-50-rgb:  242 246 254;
-  --brand-100-rgb: 229 236 253;
-  --brand-200-rgb: 202 217 250;
-  --brand-300-rgb: 147 174 245;
-  --brand-400-rgb: 90 138 240;
-  --brand-500-rgb: 37 99 235;
-  --brand-600-rgb: 37 99 235;
-  --brand-700-rgb: 29 78 216;
-  --brand-800-rgb: 24 64 177;
-  --brand-900-rgb: 19 51 143;
+  --brand-50-rgb:  238 236 231;
+  --brand-100-rgb: 224 224 217;
+  --brand-200-rgb: 198 199 191;
+  --brand-300-rgb: 156 159 149;
+  --brand-400-rgb: 114 119 106;
+  --brand-500-rgb: 61 69 53;
+  --brand-600-rgb: 61 69 53;
+  --brand-700-rgb: 43 49 37;
+  --brand-800-rgb: 36 41 31;
+  --brand-900-rgb: 29 33 25;
+
+  /* Accent: bronze, used for eyebrows, indicators and fine details */
+  --accent:        #8b6a3e;
+  --accent-soft:   rgba(139, 106, 62, 0.12);
 
   /* Sidebar */
-  --sidebar-bg:    #0c1628;
-  --sidebar-bg-alt: #080f1c;
-  --sidebar-hover: #172238;
-  --sidebar-text:  #c8d3e3;
-  --sidebar-subtext: #7f91aa;
-  --sidebar-active-bg: rgba(37, 99, 235, 0.20);
-  --sidebar-active-text: #bcd7fe;
-  --sidebar-active-border: rgba(37, 99, 235, 0.34);
-  --sidebar-accent: #2563eb;
-  --sidebar-accent-2: #628ff1;
-  --sidebar-border: rgba(255, 255, 255, 0.07);
-  --sidebar-glow:   rgba(37, 99, 235, 0.32);
+  --sidebar-bg:    #f7f3ec;
+  --sidebar-bg-alt: #f7f3ec;
+  --sidebar-hover: rgba(42, 37, 31, 0.045);
+  --sidebar-text:  #5a5145;
+  --sidebar-subtext: #776c5c;
+  --sidebar-active-bg: rgba(61, 69, 53, 0.09);
+  --sidebar-active-text: #2b3125;
+  --sidebar-active-border: rgba(61, 69, 53, 0.2);
+  --sidebar-accent: #3d4535;
+  --sidebar-accent-2: #5f6557;
+  --sidebar-border: #e0d6c5;
+  --sidebar-glow:   rgba(42, 37, 31, 0.22);
+  /* Sidebar details (mode-only, not palette-driven) */
+  --sidebar-title: #2a251f;
+  --sidebar-hover-text: #2a251f;
+  --sidebar-active-indicator: #8b6a3e;
+  --sidebar-panel: rgba(42, 37, 31, 0.025);
+  --sidebar-footer: rgba(42, 37, 31, 0.03);
+  --sidebar-btn-bg: #fbf9f4;
+  --sidebar-btn-border: #e0d6c5;
+  --sidebar-elevation: none;
+
+  /* Marketplace channel chips */
+  --chip-meesho-bg: rgba(168, 61, 104, 0.08);
+  --chip-meesho-text: #8e3a5c;
+  --chip-meesho-border: rgba(168, 61, 104, 0.24);
+  --chip-flipkart-bg: rgba(46, 84, 140, 0.08);
+  --chip-flipkart-text: #2e548c;
+  --chip-flipkart-border: rgba(46, 84, 140, 0.24);
+  --chip-flipkart-dot: #2e548c;
+  --flipkart-text: #2e548c;
 
   /* Elevation */
-  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 14px 32px -22px rgba(15, 23, 42, 0.22);
-  --shadow-popover: 0 28px 70px -28px rgba(15, 23, 42, 0.32);
+  --shadow-card: 0 1px 2px rgba(42, 37, 31, 0.04), 0 12px 30px -24px rgba(42, 37, 31, 0.22);
+  --shadow-popover: 0 2px 6px rgba(42, 37, 31, 0.05), 0 26px 60px -28px rgba(42, 37, 31, 0.32);
+  --backdrop: rgba(42, 37, 31, 0.38);
 
   /* Background texture */
-  --app-glow-1: rgba(37, 99, 235, 0.09);
-  --app-glow-2: rgba(37, 99, 235, 0.05);
-  --network-dot: rgba(37, 99, 235, 0.16);
+  --app-glow-1: rgba(139, 106, 62, 0.06);
+  --app-glow-2: rgba(61, 69, 53, 0.035);
+  --network-dot: rgba(139, 106, 62, 0.13);
 
   /* Scrollbar */
-  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-thumb: #d3c8b5;
+
+  /* Charts: earthy, tailored series colours. Named after the hue they
+     replace so every chart keeps its series order in both modes. */
+  --chart-blue: #3d4535;     /* olive */
+  --chart-blue-2: #6b7560;   /* light olive */
+  --chart-violet: #6b5a7e;   /* plum */
+  --chart-purple: #7d6a8f;   /* heather */
+  --chart-amber: #b5835a;    /* camel */
+  --chart-emerald: #6f8a5b;  /* sage */
+  --chart-pink: #a8506f;     /* mulberry */
+  --chart-red: #a85741;      /* brick */
+  --chart-cyan: #5b7f86;     /* teal slate */
+  --chart-slate: #9a8e7a;    /* taupe */
+  --chart-meesho: #a8506f;
+  --chart-flipkart: #3f5f8c;
+  --chart-tooltip-bg: #fbf9f4;
+  --chart-tooltip-border: #e0d6c5;
+  --chart-tooltip-text: #2a251f;
+
+  /* Outlined action buttons */
+  --btn-neutral-border: #cbbfa9;
+  --btn-neutral-text: #2a251f;
+  --btn-info-border: rgba(61, 69, 53, 0.45);
+  --btn-info-text: #2b3125;
+  --btn-warning-border: #c79a45;
+  --btn-warning-text: #79531e;
+  --btn-success-border: #7c9c66;
+  --btn-success-text: #3c552e;
+
+  /* Auth screens */
+  --auth-panel-bg: radial-gradient(circle at 78% 12%, rgba(139, 106, 62, 0.35), transparent 38%), linear-gradient(150deg, #3d4535 0%, #262b21 100%);
+  --auth-cta-bg: #3d4535;
+  --auth-cta-text: #fbf9f4;
+  --auth-logo-bg: #8b6a3e;
+
+  /* Breadcrumb separators */
+  --breadcrumb-sep: #b3a487;
+
+  /* Base white (ivory in light mode so stark white never appears) */
+  --white-rgb: 251 249 244;
+
+  /* Typography */
+  --font-sans: var(--font-instrument), "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-alegreya), "Alegreya", Georgia, "Times New Roman", serif;
+
+  /* Corner radii: tailored, never bubbly */
+  --radius-sm: 2px;
+  --radius: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+  --radius-2xl: 12px;
+  --radius-3xl: 16px;
+
+  /* Neutral + status scales (Tailwind slate/gray/emerald/amber/rose) */
+  --slate-50-rgb: 248 245 239;
+  --slate-100-rgb: 241 235 224;
+  --slate-200-rgb: 228 220 205;
+  --slate-300-rgb: 211 200 181;
+  --slate-400-rgb: 154 142 122;
+  --slate-500-rgb: 119 108 92;
+  --slate-600-rgb: 95 85 71;
+  --slate-700-rgb: 74 66 55;
+  --slate-800-rgb: 53 47 39;
+  --slate-900-rgb: 42 37 31;
+  --slate-950-rgb: 26 22 18;
+  --gray-50-rgb: 248 245 239;
+  --gray-100-rgb: 241 235 224;
+  --gray-200-rgb: 228 220 205;
+  --gray-300-rgb: 211 200 181;
+  --gray-400-rgb: 154 142 122;
+  --gray-500-rgb: 119 108 92;
+  --gray-600-rgb: 95 85 71;
+  --gray-700-rgb: 74 66 55;
+  --gray-800-rgb: 53 47 39;
+  --gray-900-rgb: 42 37 31;
+  --gray-950-rgb: 26 22 18;
+  --emerald-50-rgb: 238 242 232;
+  --emerald-100-rgb: 223 231 213;
+  --emerald-200-rgb: 196 211 181;
+  --emerald-300-rgb: 160 184 140;
+  --emerald-400-rgb: 124 156 102;
+  --emerald-500-rgb: 95 130 73;
+  --emerald-600-rgb: 75 106 57;
+  --emerald-700-rgb: 60 85 46;
+  --emerald-800-rgb: 49 69 38;
+  --emerald-900-rgb: 40 57 32;
+  --emerald-950-rgb: 23 33 18;
+  --amber-50-rgb: 249 242 227;
+  --amber-100-rgb: 242 228 196;
+  --amber-200-rgb: 231 207 151;
+  --amber-300-rgb: 217 180 104;
+  --amber-400-rgb: 199 154 69;
+  --amber-500-rgb: 178 130 46;
+  --amber-600-rgb: 150 106 36;
+  --amber-700-rgb: 121 83 30;
+  --amber-800-rgb: 98 67 27;
+  --amber-900-rgb: 81 56 24;
+  --amber-950-rgb: 46 31 12;
+  --rose-50-rgb: 248 236 231;
+  --rose-100-rgb: 241 217 208;
+  --rose-200-rgb: 229 185 170;
+  --rose-300-rgb: 212 146 127;
+  --rose-400-rgb: 192 112 90;
+  --rose-500-rgb: 168 87 65;
+  --rose-600-rgb: 143 69 51;
+  --rose-700-rgb: 116 56 42;
+  --rose-800-rgb: 95 47 36;
+  --rose-900-rgb: 79 40 31;
+  --rose-950-rgb: 43 19 14;
+  --purple-50-rgb: 244 241 246;
+  --purple-100-rgb: 233 227 238;
+  --purple-200-rgb: 213 203 221;
+  --purple-300-rgb: 184 169 196;
+  --purple-400-rgb: 154 135 170;
+  --purple-500-rgb: 125 106 143;
+  --purple-600-rgb: 104 88 120;
+  --purple-700-rgb: 85 72 98;
+  --purple-800-rgb: 68 58 79;
+  --purple-900-rgb: 56 47 65;
+  --purple-950-rgb: 33 27 39;
+  --violet-50-rgb: 244 241 246;
+  --violet-100-rgb: 233 227 238;
+  --violet-200-rgb: 213 203 221;
+  --violet-300-rgb: 184 169 196;
+  --violet-400-rgb: 154 135 170;
+  --violet-500-rgb: 125 106 143;
+  --violet-600-rgb: 104 88 120;
+  --violet-700-rgb: 85 72 98;
+  --violet-800-rgb: 68 58 79;
+  --violet-900-rgb: 56 47 65;
+  --violet-950-rgb: 33 27 39;
+  --indigo-50-rgb: 239 241 245;
+  --indigo-100-rgb: 223 227 235;
+  --indigo-200-rgb: 195 202 216;
+  --indigo-300-rgb: 158 169 191;
+  --indigo-400-rgb: 122 136 163;
+  --indigo-500-rgb: 91 111 134;
+  --indigo-600-rgb: 75 92 113;
+  --indigo-700-rgb: 62 75 93;
+  --indigo-800-rgb: 51 62 77;
+  --indigo-900-rgb: 43 52 64;
+  --indigo-950-rgb: 25 30 37;
+  --sky-50-rgb: 238 243 243;
+  --sky-100-rgb: 220 231 232;
+  --sky-200-rgb: 189 209 211;
+  --sky-300-rgb: 148 180 184;
+  --sky-400-rgb: 111 150 155;
+  --sky-500-rgb: 91 127 134;
+  --sky-600-rgb: 75 106 112;
+  --sky-700-rgb: 62 87 92;
+  --sky-800-rgb: 51 71 75;
+  --sky-900-rgb: 43 59 62;
+  --sky-950-rgb: 24 34 36;
+  --cyan-50-rgb: 238 243 243;
+  --cyan-100-rgb: 220 231 232;
+  --cyan-200-rgb: 189 209 211;
+  --cyan-300-rgb: 148 180 184;
+  --cyan-400-rgb: 111 150 155;
+  --cyan-500-rgb: 91 127 134;
+  --cyan-600-rgb: 75 106 112;
+  --cyan-700-rgb: 62 87 92;
+  --cyan-800-rgb: 51 71 75;
+  --cyan-900-rgb: 43 59 62;
+  --cyan-950-rgb: 24 34 36;
+  --pink-50-rgb: 248 238 241;
+  --pink-100-rgb: 241 221 227;
+  --pink-200-rgb: 229 191 202;
+  --pink-300-rgb: 211 152 170;
+  --pink-400-rgb: 189 113 137;
+  --pink-500-rgb: 168 80 111;
+  --pink-600-rgb: 142 58 92;
+  --pink-700-rgb: 116 48 75;
+  --pink-800-rgb: 95 41 62;
+  --pink-900-rgb: 79 35 53;
+  --pink-950-rgb: 44 17 28;
+  --meesho-rgb: 142 58 92;
+  --flipkart-rgb: 46 84 140;
 }
 
 .dark {
-  /* Surface — lifted, softer midnight tones (not pitch black) */
-  --bg-base:       #1a2230;
-  --bg-surface:    #222c3d;
-  --bg-surface2:   #293547;
-  --bg-surface3:   #313f54;
+  /* ── Lapels after hours ─────────────────────────────────────────
+     Near-black page, cream type, camel accent, bronze hairlines.
+     Palette-driven values below are also written at runtime by
+     ThemeContext; these are the pre-hydration defaults. */
+  --bg-base: #060504;
+  --bg-surface: #100e0b;
+  --bg-surface2: #17140f;
+  --bg-surface3: #201b15;
+  --border: #2f271d;
+  --border-subtle: #1f1a14;
+  --border-strong: #4a3c2a;
+  --text-primary: #f1e8d8;
+  --text-secondary: #c9bba3;
+  --text-tertiary: #978a74;
+  --scrollbar-thumb: #3a3024;
+  --brand: #c49a5c;
+  --brand-rgb: 196 154 92;
+  --brand-contrast: #120f0b;
+  --brand-text: #cca872;
+  --brand-soft: rgba(196, 154, 92, 0.12);
+  --brand-soft-strong: rgba(196, 154, 92, 0.2);
+  --brand-border: rgba(196, 154, 92, 0.38);
+  --brand-ring: rgba(196, 154, 92, 0.24);
+  --brand-glow: rgba(196, 154, 92, 0.22);
+  --app-glow-1: rgba(196, 154, 92, 0.07);
+  --app-glow-2: rgba(196, 154, 92, 0.035);
+  --network-dot: rgba(196, 154, 92, 0.1);
+  --sidebar-bg: #0a0907;
+  --sidebar-bg-alt: #0a0907;
+  --sidebar-hover: rgba(241, 232, 216, 0.05);
+  --sidebar-text: #c9bba3;
+  --sidebar-subtext: #978a74;
+  --sidebar-active-bg: rgba(196, 154, 92, 0.12);
+  --sidebar-active-text: #cca872;
+  --sidebar-active-border: rgba(196, 154, 92, 0.32);
+  --sidebar-accent: #c49a5c;
+  --sidebar-accent-2: #cdaa75;
+  --sidebar-border: rgba(196, 154, 92, 0.2);
+  --sidebar-glow: rgba(196, 154, 92, 0.25);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.5), 0 14px 32px -24px rgba(0, 0, 0, 0.9);
+  --shadow-popover: 0 2px 8px rgba(0, 0, 0, 0.5), 0 28px 70px -24px rgba(0, 0, 0, 0.95);
+  --brand-50-rgb: 29 23 15;
+  --brand-50: #1d170f;
+  --brand-100-rgb: 44 35 22;
+  --brand-100: #2c2316;
+  --brand-200-rgb: 74 59 36;
+  --brand-200: #4a3b24;
+  --brand-300-rgb: 120 94 57;
+  --brand-300: #785e39;
+  --brand-400-rgb: 203 166 112;
+  --brand-400: #cba670;
+  --brand-500-rgb: 196 154 92;
+  --brand-500: #c49a5c;
+  --brand-600-rgb: 196 154 92;
+  --brand-600: #c49a5c;
+  --brand-700-rgb: 207 173 122;
+  --brand-700: #cfad7a;
+  --brand-800-rgb: 214 185 142;
+  --brand-800: #d6b98e;
+  --brand-900-rgb: 221 198 161;
+  --brand-900: #ddc6a1;
 
-  /* Border */
-  --border:        #3a4961;
-  --border-subtle: #2b374a;
+  /* Accent: camel */
+  --accent:        #c49a5c;
+  --accent-soft:   rgba(196, 154, 92, 0.14);
 
-  /* Text */
-  --text-primary:   #e8eef8;
-  --text-secondary: #a7b5c9;
-  --text-tertiary:  #7f90a8;
+  /* Sidebar details */
+  --sidebar-title: #f1e8d8;
+  --sidebar-hover-text: #f1e8d8;
+  --sidebar-active-indicator: #c49a5c;
+  --sidebar-panel: rgba(241, 232, 216, 0.02);
+  --sidebar-footer: rgba(241, 232, 216, 0.025);
+  --sidebar-btn-bg: rgba(241, 232, 216, 0.03);
+  --sidebar-btn-border: #2f271d;
+  --sidebar-elevation: none;
 
-  /* Brand — lightened for readable accents on dark surfaces */
-  --brand:          #60a5fa;
-  --brand-rgb:      96 165 250;
-  --brand-contrast: #0b1220;
-  --brand-text:     #76b2fb;
-  --brand-soft:     rgba(96, 165, 250, 0.16);
-  --brand-soft-strong: rgba(96, 165, 250, 0.26);
-  --brand-border:   rgba(96, 165, 250, 0.42);
-  --brand-ring:     rgba(96, 165, 250, 0.28);
-  --brand-glow:     rgba(96, 165, 250, 0.32);
+  /* Marketplace channel chips */
+  --chip-meesho-bg: rgba(199, 122, 149, 0.12);
+  --chip-meesho-text: #dba3b6;
+  --chip-meesho-border: rgba(199, 122, 149, 0.3);
+  --chip-flipkart-bg: rgba(125, 156, 196, 0.12);
+  --chip-flipkart-text: #a9c0dd;
+  --chip-flipkart-border: rgba(125, 156, 196, 0.3);
+  --chip-flipkart-dot: #7d9cc4;
+  --flipkart-text: #a9c0dd;
 
-  --brand-50-rgb:  39 58 84;
-  --brand-100-rgb: 46 71 105;
-  --brand-200-rgb: 57 92 137;
-  --brand-300-rgb: 74 123 185;
-  --brand-400-rgb: 118 178 251;
-  --brand-500-rgb: 96 165 250;
-  --brand-600-rgb: 96 165 250;
-  --brand-700-rgb: 131 185 251;
-  --brand-800-rgb: 153 197 252;
-  --brand-900-rgb: 176 210 253;
+  --backdrop: rgba(0, 0, 0, 0.72);
 
-  /* Sidebar stays deep but is tinted by the palette at runtime */
-  --sidebar-bg:    #14203c;
-  --sidebar-bg-alt: #111e39;
-  --sidebar-hover: #222d48;
-  --sidebar-text:  #c8d3e3;
-  --sidebar-subtext: #8595ad;
-  --sidebar-active-bg: rgba(96, 165, 250, 0.18);
-  --sidebar-active-text: #cfe3ff;
-  --sidebar-active-border: rgba(96, 165, 250, 0.42);
-  --sidebar-accent: #60a5fa;
-  --sidebar-accent-2: #8bbcfb;
-  --sidebar-border: rgba(255, 255, 255, 0.07);
-  --sidebar-glow:   rgba(96, 165, 250, 0.40);
+  /* Charts: warm, luminous series on black */
+  --chart-blue: #c49a5c;     /* camel */
+  --chart-blue-2: #e3cfa8;   /* sand */
+  --chart-violet: #a493b8;   /* heather */
+  --chart-purple: #b3a2c4;   /* lilac */
+  --chart-amber: #d98f4e;    /* burnt orange */
+  --chart-emerald: #8fae7a;  /* sage */
+  --chart-pink: #c77a95;     /* mulberry */
+  --chart-red: #c9694f;      /* brick */
+  --chart-cyan: #7fa3a8;     /* teal slate */
+  --chart-slate: #8c8070;    /* taupe */
+  --chart-meesho: #c77a95;
+  --chart-flipkart: #7d9cc4;
+  --chart-tooltip-bg: #100e0b;
+  --chart-tooltip-border: #2f271d;
+  --chart-tooltip-text: #f1e8d8;
 
-  /* Elevation */
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.28), 0 14px 32px -20px rgba(0, 0, 0, 0.65);
-  --shadow-popover: 0 28px 70px -22px rgba(0, 0, 0, 0.80);
+  /* Outlined action buttons */
+  --btn-neutral-border: #4a3c2a;
+  --btn-neutral-text: #f1e8d8;
+  --btn-info-border: rgba(196, 154, 92, 0.5);
+  --btn-info-text: #d8b47b;
+  --btn-warning-border: #c79a45;
+  --btn-warning-text: #e0bb7a;
+  --btn-success-border: #7c9c66;
+  --btn-success-text: #a8c48f;
 
-  /* Background texture */
-  --app-glow-1: rgba(96, 165, 250, 0.16);
-  --app-glow-2: rgba(96, 165, 250, 0.09);
-  --network-dot: rgba(96, 165, 250, 0.28);
+  /* Auth screens */
+  --auth-panel-bg: radial-gradient(circle at 78% 12%, rgba(196, 154, 92, 0.26), transparent 40%), linear-gradient(150deg, #16120c 0%, #050403 100%);
+  --auth-cta-bg: #c49a5c;
+  --auth-cta-text: #120f0b;
+  --auth-logo-bg: #c49a5c;
 
-  /* Scrollbar */
-  --scrollbar-thumb: #3a4961;
+  --breadcrumb-sep: #5a4a35;
+
+  /* "White" is cream after dark */
+  --white-rgb: 241 232 216;
+
+  /* Same typefaces as light mode */
+  --font-sans: var(--font-instrument), "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-alegreya), "Alegreya", Georgia, "Times New Roman", serif;
+
+  /* Status + accent hues, inverted for black: deep tints, pale ink.
+     Neutral slate/gray scales and radii are shared with light mode. */
+  --emerald-50-rgb: 18 23 14;
+  --emerald-100-rgb: 27 35 21;
+  --emerald-200-rgb: 43 58 33;
+  --emerald-300-rgb: 67 90 51;
+  --emerald-400-rgb: 142 170 121;
+  --emerald-500-rgb: 124 156 102;
+  --emerald-600-rgb: 160 184 140;
+  --emerald-700-rgb: 196 211 181;
+  --emerald-800-rgb: 223 231 213;
+  --emerald-900-rgb: 238 242 232;
+  --emerald-950-rgb: 251 247 239;
+  --amber-50-rgb: 30 23 10;
+  --amber-100-rgb: 47 35 14;
+  --amber-200-rgb: 78 58 22;
+  --amber-300-rgb: 123 90 33;
+  --amber-400-rgb: 208 167 87;
+  --amber-500-rgb: 199 154 69;
+  --amber-600-rgb: 217 180 104;
+  --amber-700-rgb: 231 207 151;
+  --amber-800-rgb: 242 228 196;
+  --amber-900-rgb: 249 242 227;
+  --amber-950-rgb: 251 247 239;
+  --rose-50-rgb: 29 16 13;
+  --rose-100-rgb: 45 25 19;
+  --rose-200-rgb: 74 39 30;
+  --rose-300-rgb: 116 61 45;
+  --rose-400-rgb: 202 129 109;
+  --rose-500-rgb: 192 112 90;
+  --rose-600-rgb: 212 146 127;
+  --rose-700-rgb: 229 185 170;
+  --rose-800-rgb: 241 217 208;
+  --rose-900-rgb: 248 236 231;
+  --rose-950-rgb: 251 247 239;
+  --purple-50-rgb: 23 19 23;
+  --purple-100-rgb: 35 29 37;
+  --purple-200-rgb: 56 47 62;
+  --purple-300-rgb: 87 74 99;
+  --purple-400-rgb: 169 152 183;
+  --purple-500-rgb: 154 135 170;
+  --purple-600-rgb: 184 169 196;
+  --purple-700-rgb: 213 203 221;
+  --purple-800-rgb: 233 227 238;
+  --purple-900-rgb: 244 241 246;
+  --purple-950-rgb: 251 247 239;
+  --violet-50-rgb: 23 19 23;
+  --violet-100-rgb: 35 29 37;
+  --violet-200-rgb: 56 47 62;
+  --violet-300-rgb: 87 74 99;
+  --violet-400-rgb: 169 152 183;
+  --violet-500-rgb: 154 135 170;
+  --violet-600-rgb: 184 169 196;
+  --violet-700-rgb: 213 203 221;
+  --violet-800-rgb: 233 227 238;
+  --violet-900-rgb: 244 241 246;
+  --violet-950-rgb: 251 247 239;
+  --indigo-50-rgb: 18 20 22;
+  --indigo-100-rgb: 26 30 35;
+  --indigo-200-rgb: 42 50 59;
+  --indigo-300-rgb: 64 77 92;
+  --indigo-400-rgb: 140 153 177;
+  --indigo-500-rgb: 122 136 163;
+  --indigo-600-rgb: 158 169 191;
+  --indigo-700-rgb: 195 202 216;
+  --indigo-800-rgb: 223 227 235;
+  --indigo-900-rgb: 239 241 245;
+  --indigo-950-rgb: 251 247 239;
+  --sky-50-rgb: 18 22 22;
+  --sky-100-rgb: 26 34 35;
+  --sky-200-rgb: 42 56 59;
+  --sky-300-rgb: 64 88 92;
+  --sky-400-rgb: 130 165 170;
+  --sky-500-rgb: 111 150 155;
+  --sky-600-rgb: 148 180 184;
+  --sky-700-rgb: 189 209 211;
+  --sky-800-rgb: 220 231 232;
+  --sky-900-rgb: 238 243 243;
+  --sky-950-rgb: 251 247 239;
+  --cyan-50-rgb: 18 22 22;
+  --cyan-100-rgb: 26 34 35;
+  --cyan-200-rgb: 42 56 59;
+  --cyan-300-rgb: 64 88 92;
+  --cyan-400-rgb: 130 165 170;
+  --cyan-500-rgb: 111 150 155;
+  --cyan-600-rgb: 148 180 184;
+  --cyan-700-rgb: 189 209 211;
+  --cyan-800-rgb: 220 231 232;
+  --cyan-900-rgb: 238 243 243;
+  --cyan-950-rgb: 251 247 239;
+  --pink-50-rgb: 29 16 19;
+  --pink-100-rgb: 45 23 30;
+  --pink-200-rgb: 74 37 49;
+  --pink-300-rgb: 116 56 77;
+  --pink-400-rgb: 200 133 154;
+  --pink-500-rgb: 189 113 137;
+  --pink-600-rgb: 211 152 170;
+  --pink-700-rgb: 229 191 202;
+  --pink-800-rgb: 241 221 227;
+  --pink-900-rgb: 248 238 241;
+  --pink-950-rgb: 251 247 239;
+  --meesho-rgb: 199 122 149;
+  --flipkart-rgb: 125 156 196;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -227,14 +606,14 @@
 }
 .sd-nav-link:hover {
   background-color: var(--sidebar-hover);
-  color: #ffffff;
+  color: var(--sidebar-hover-text);
 }
 .sd-nav-link svg {
   color: var(--sidebar-subtext);
   transition: color 0.15s ease;
 }
 .sd-nav-link:hover svg {
-  color: #ffffff;
+  color: var(--sidebar-hover-text);
 }
 .sd-nav-link.is-active {
   background-color: var(--sidebar-active-bg);
@@ -359,55 +738,6 @@ html.dark #__next-root .bg-blue-600.text-white,
 html.dark #__next-root .bg-blue-700.text-white {
   color: var(--brand-contrast) !important;
 }
-
-/* ── Pastel semantic surfaces in dark mode ───────────────────────── */
-html.dark #__next-root .bg-emerald-50,
-html.dark #__next-root .bg-emerald-50\/50 {
-  background-color: rgba(16, 185, 129, 0.14) !important;
-}
-html.dark #__next-root .bg-emerald-100 {
-  background-color: rgba(16, 185, 129, 0.2) !important;
-}
-html.dark #__next-root .text-emerald-600 { color: #34d399 !important; }
-html.dark #__next-root .text-emerald-700,
-html.dark #__next-root .text-emerald-800 { color: #6ee7b7 !important; }
-html.dark #__next-root .border-emerald-200 { border-color: rgba(16, 185, 129, 0.36) !important; }
-
-html.dark #__next-root .bg-amber-50,
-html.dark #__next-root .bg-amber-50\/50 {
-  background-color: rgba(245, 158, 11, 0.14) !important;
-}
-html.dark #__next-root .bg-amber-100 {
-  background-color: rgba(245, 158, 11, 0.2) !important;
-}
-html.dark #__next-root .text-amber-600 { color: #fbbf24 !important; }
-html.dark #__next-root .text-amber-700,
-html.dark #__next-root .text-amber-800,
-html.dark #__next-root .text-amber-900 { color: #fcd34d !important; }
-html.dark #__next-root .border-amber-200 { border-color: rgba(245, 158, 11, 0.36) !important; }
-
-html.dark #__next-root .bg-rose-50 {
-  background-color: rgba(244, 63, 94, 0.14) !important;
-}
-html.dark #__next-root .bg-rose-100 {
-  background-color: rgba(244, 63, 94, 0.2) !important;
-}
-html.dark #__next-root .text-rose-600 { color: #fb7185 !important; }
-html.dark #__next-root .text-rose-700,
-html.dark #__next-root .text-rose-800 { color: #fda4af !important; }
-html.dark #__next-root .border-rose-200 { border-color: rgba(244, 63, 94, 0.36) !important; }
-
-html.dark #__next-root .bg-pink-50,
-html.dark #__next-root .bg-pink-50\/30,
-html.dark #__next-root .bg-pink-50\/40,
-html.dark #__next-root .bg-pink-50\/50 {
-  background-color: rgba(236, 72, 153, 0.12) !important;
-}
-html.dark #__next-root .bg-pink-100 {
-  background-color: rgba(236, 72, 153, 0.2) !important;
-}
-html.dark #__next-root .text-pink-600 { color: #f472b6 !important; }
-html.dark #__next-root .text-pink-700 { color: #f9a8d4 !important; }
 
 /* Mobile app shell; desktop navigation and page spacing remain unchanged. */
 .sd-mobile-nav {
@@ -595,32 +925,6 @@ html.dark #__next-root .text-pink-700 { color: #f9a8d4 !important; }
     animation: none;
   }
 }
-html.dark #__next-root .border-pink-200 { border-color: rgba(236, 72, 153, 0.36) !important; }
-
-html.dark #__next-root .bg-purple-50,
-html.dark #__next-root .bg-violet-50 {
-  background-color: rgba(139, 92, 246, 0.14) !important;
-}
-html.dark #__next-root .text-purple-700,
-html.dark #__next-root .text-violet-700 { color: #c4b5fd !important; }
-html.dark #__next-root .border-purple-200,
-html.dark #__next-root .border-violet-200 { border-color: rgba(139, 92, 246, 0.36) !important; }
-
-html.dark #__next-root .bg-indigo-50 {
-  background-color: rgba(99, 102, 241, 0.14) !important;
-}
-html.dark #__next-root .bg-indigo-100 {
-  background-color: rgba(99, 102, 241, 0.2) !important;
-}
-html.dark #__next-root .text-indigo-700 { color: #a5b4fc !important; }
-
-html.dark #__next-root .bg-cyan-50,
-html.dark #__next-root .bg-sky-50 {
-  background-color: rgba(6, 182, 212, 0.14) !important;
-}
-html.dark #__next-root .text-cyan-700,
-html.dark #__next-root .text-sky-700 { color: #67e8f9 !important; }
-
 /* ═══════════════════════════════════════════════════════════════════
    MUI — inherit the semantic surfaces everywhere
 ═══════════════════════════════════════════════════════════════════ */
@@ -668,7 +972,7 @@ html.dark #__next-root .text-sky-700 { color: #67e8f9 !important; }
 /* Dialog backdrop gets a softer, more modern blur */
 .MuiBackdrop-root {
   backdrop-filter: blur(3px);
-  background-color: rgba(8, 13, 23, 0.55) !important;
+  background-color: var(--backdrop) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -697,3 +1001,175 @@ html.dark #__next-root .text-sky-700 { color: #67e8f9 !important; }
 .recharts-legend-item-text {
   color: var(--text-secondary) !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAPELS DESIGN LANGUAGE (light, dark and system)
+   Typography and shapes apply to every mode via :root; colours come
+   from the per-mode tokens (light: linen + olive, dark: black + cream
+   + camel). Only the dashboard feature band has per-mode rules.
+═══════════════════════════════════════════════════════════════════ */
+
+/* ── Typography (all modes) ─────────────────────────────────────── */
+:root body {
+  font-feature-settings: "kern", "liga";
+}
+
+/* Editorial serif for headings, dialog titles and display figures */
+:root #__next-root :is(h1, h2, h3),
+:root .MuiDialogTitle-root,
+:root #__next-root .font-display {
+  font-family: var(--font-display);
+  font-size-adjust: 0.49; /* Alegreya runs small; match the body x-height */
+  letter-spacing: -0.003em;
+}
+:root #__next-root :is(h2, h3),
+:root .MuiDialogTitle-root {
+  font-weight: 600;
+}
+:root #__next-root h1 {
+  font-weight: 500;
+  letter-spacing: -0.012em;
+}
+:root #__next-root .font-display.font-bold {
+  font-weight: 600;
+}
+
+/* Page titles: large, calm, editorial */
+:root #__next-root .sd-page-title {
+  font-size: clamp(1.65rem, 1.25rem + 1.1vw, 2.2rem);
+  line-height: 1.12;
+}
+
+/* Small uppercase labels get the Lapels eyebrow treatment */
+:root #__next-root .uppercase.tracking-wider,
+:root #__next-root .uppercase.tracking-wide {
+  letter-spacing: 0.09em;
+}
+:root #__next-root .uppercase.tracking-widest {
+  letter-spacing: 0.16em;
+}
+
+/* Wordmark: italic serif, like the Lapels logotype */
+:root #__next-root .sd-wordmark {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-size-adjust: 0.49;
+  font-size: 1.3rem;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+/* ── Shapes & interactive elements (all modes) ─────────────────── */
+
+/* Primary filled CTAs become tailored pills */
+:root #__next-root :is(a, button).bg-blue-600,
+:root #__next-root :is(a, button).bg-blue-500 {
+  border-radius: 9999px;
+  letter-spacing: 0.01em;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+:root #__next-root :is(a, button).bg-blue-600:hover,
+:root #__next-root :is(a, button).bg-blue-500:hover {
+  background-color: var(--brand-700);
+}
+
+/* Header icon buttons are circular, like the reference's theme toggle */
+:root .sd-icon-btn {
+  border-radius: 9999px;
+}
+
+/* Sidebar navigation */
+:root .sd-nav-link {
+  border-radius: var(--radius-lg);
+}
+:root .sd-nav-link.is-active {
+  box-shadow: inset 0 0 0 1px var(--sidebar-active-border);
+  font-weight: 600;
+}
+:root .sd-nav-link.is-active svg {
+  color: var(--accent);
+}
+
+/* Dashboard quick-operations band: deep olive panel, ivory pills */
+html:not(.dark) #__next-root .sd-feature-band {
+  background-image: linear-gradient(115deg, var(--brand-600) 0%, var(--brand-800) 100%);
+  border: 1px solid var(--brand-700);
+}
+html:not(.dark) #__next-root .sd-feature-band :is(a, button) {
+  border-radius: 9999px;
+}
+html:not(.dark) #__next-root .sd-feature-band .bg-blue-600 {
+  background-color: var(--bg-surface);
+  color: var(--brand-text);
+}
+html:not(.dark) #__next-root .sd-feature-band .bg-blue-600:hover {
+  background-color: var(--bg-surface3);
+}
+html:not(.dark) #__next-root .sd-feature-band .bg-slate-700 {
+  background-color: rgba(251, 249, 244, 0.06);
+  border: 1px solid rgba(251, 249, 244, 0.24);
+}
+html:not(.dark) #__next-root .sd-feature-band .bg-slate-700:hover {
+  background-color: rgba(251, 249, 244, 0.14);
+}
+
+/* Dark: black band with a camel hairline, camel + outline pills */
+html.dark #__next-root .sd-feature-band {
+  background-image: radial-gradient(600px 160px at 85% 0%, rgba(196, 154, 92, 0.12), transparent 70%),
+    linear-gradient(115deg, #15110c 0%, #0a0907 100%);
+  border: 1px solid rgba(196, 154, 92, 0.26);
+}
+html.dark #__next-root .sd-feature-band :is(a, button) {
+  border-radius: 9999px;
+}
+html.dark #__next-root .sd-feature-band .bg-slate-700 {
+  background-color: transparent;
+  border: 1px solid rgba(241, 232, 216, 0.24);
+}
+html.dark #__next-root .sd-feature-band .bg-slate-700:hover {
+  background-color: rgba(241, 232, 216, 0.08);
+}
+
+/* Auth screens */
+:root #__next-root .sd-auth-card {
+  border-radius: 16px;
+}
+:root #__next-root .sd-auth-cta {
+  border-radius: 9999px;
+  letter-spacing: 0.02em;
+}
+:root #__next-root .sd-auth-panel .text-blue-100 { color: #efe6d6; }
+:root #__next-root .sd-auth-panel .text-blue-200 { color: #e4d6bd; }
+:root #__next-root .sd-auth-panel .text-blue-300 { color: #d9bf94; }
+:root #__next-root .sd-auth-panel .text-slate-300 { color: rgba(251, 249, 244, 0.78); }
+:root #__next-root .sd-auth-panel .text-slate-400 { color: rgba(251, 249, 244, 0.6); }
+
+/* ── Overlays ───────────────────────────────────────────────────── */
+/* Menus and popovers should not dim the page; only real dialogs do. */
+:root .MuiBackdrop-root.MuiBackdrop-invisible {
+  background-color: transparent !important;
+  backdrop-filter: none;
+}
+:root .MuiBackdrop-root:not(.MuiBackdrop-invisible) {
+  backdrop-filter: blur(2px);
+}
+
+/* ── Data visualisation ─────────────────────────────────────────── */
+:root .recharts-default-tooltip {
+  border-radius: 6px !important;
+}
+:root .recharts-tooltip-label {
+  font-family: var(--font-display);
+}
+:root .recharts-cartesian-axis-tick-value {
+  fill: var(--text-tertiary) !important;
+}
+
+/* ── Motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  :root #__next-root :is(a, button) {
+    transition: none !important;
+  }
+}
+

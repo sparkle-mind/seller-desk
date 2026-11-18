@@ -3,18 +3,25 @@
 // The whole brand scale is driven by CSS variables written by ThemeContext.
 // `rgb(... / <alpha-value>)` keeps Tailwind opacity modifiers working
 // (e.g. `ring-blue-500/20`).
-const brandScale = {
-  50: "rgb(var(--brand-50-rgb) / <alpha-value>)",
-  100: "rgb(var(--brand-100-rgb) / <alpha-value>)",
-  200: "rgb(var(--brand-200-rgb) / <alpha-value>)",
-  300: "rgb(var(--brand-300-rgb) / <alpha-value>)",
-  400: "rgb(var(--brand-400-rgb) / <alpha-value>)",
-  500: "rgb(var(--brand-500-rgb) / <alpha-value>)",
-  600: "rgb(var(--brand-600-rgb) / <alpha-value>)",
-  700: "rgb(var(--brand-700-rgb) / <alpha-value>)",
-  800: "rgb(var(--brand-800-rgb) / <alpha-value>)",
-  900: "rgb(var(--brand-900-rgb) / <alpha-value>)",
-};
+const varScale = (name, shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900]) =>
+  Object.fromEntries(
+    shades.map((shade) => [shade, `rgb(var(--${name}-${shade}-rgb) / <alpha-value>)`])
+  );
+
+const brandScale = varScale("brand");
+
+// Neutral + status scales are theme-aware too. In light mode they resolve to
+// the warm "Lapels" tones; in dark mode (.dark) they resolve to Tailwind's
+// original values, so the dark design is untouched. See globals.css.
+const FULL = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+const slateScale = varScale("slate", FULL);
+const grayScale = varScale("gray", FULL);
+const emeraldScale = varScale("emerald", FULL);
+const amberScale = varScale("amber", FULL);
+const roseScale = varScale("rose", FULL);
+const accentHues = Object.fromEntries(
+  ["purple", "violet", "indigo", "sky", "cyan", "pink"].map((hue) => [hue, varScale(hue, FULL)])
+);
 
 module.exports = {
   darkMode: "class",
@@ -28,8 +35,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // CSS-variable-backed semantic tokens
-        base: "var(--bg-base)",
+        // CSS-variable-backed semantic tokens.
+        // Note: there is intentionally no `base` colour here; it collided with
+        // the `text-base` font-size utility and painted text in the page
+        // background colour. `bg-base` comes from `backgroundColor` below.
         surface: "var(--bg-surface)",
         surface2: "var(--bg-surface2)",
         surface3: "var(--bg-surface3)",
@@ -40,9 +49,16 @@ module.exports = {
         // every legacy accent in the app follows the selected palette.
         brand: { DEFAULT: "rgb(var(--brand-rgb) / <alpha-value>)", ...brandScale },
         blue: brandScale,
+        slate: slateScale,
+        gray: grayScale,
+        emerald: emeraldScale,
+        amber: amberScale,
+        rose: roseScale,
+        ...accentHues,
+        white: "rgb(var(--white-rgb) / <alpha-value>)",
 
-        meesho: "#e11d48",
-        flipkart: "#2874f0",
+        meesho: "rgb(var(--meesho-rgb) / <alpha-value>)",
+        flipkart: "rgb(var(--flipkart-rgb) / <alpha-value>)",
       },
       textColor: {
         primary: "var(--text-primary)",
@@ -64,15 +80,19 @@ module.exports = {
         popover: "var(--shadow-popover)",
       },
       fontFamily: {
-        sans: [
-          "Inter",
-          "system-ui",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "Roboto",
-          "sans-serif",
-        ],
+        // Light: Instrument Sans body + Alegreya display (Lapels). Dark: original stack.
+        sans: ["var(--font-sans)"],
+        display: ["var(--font-display)"],
+      },
+      borderRadius: {
+        // Light mode uses tighter, tailored corners; dark keeps Tailwind defaults.
+        sm: "var(--radius-sm)",
+        DEFAULT: "var(--radius)",
+        md: "var(--radius-md)",
+        lg: "var(--radius-lg)",
+        xl: "var(--radius-xl)",
+        "2xl": "var(--radius-2xl)",
+        "3xl": "var(--radius-3xl)",
       },
     },
   },

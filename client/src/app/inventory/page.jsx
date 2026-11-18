@@ -356,7 +356,7 @@ export default function InventoryPage() {
             size="small"
             startIcon={<FileDownloadIcon />}
             onClick={currentTab === 0 ? handleExportStock : handleExportMovements}
-            sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+            sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
           >
             Export {currentTab === 0 ? "Inventory CSV" : "Movements CSV"}
           </Button>

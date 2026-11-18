@@ -223,7 +223,7 @@ export default function PurchaseOrderDetailPage() {
               size="small"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.back()}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
@@ -246,7 +246,7 @@ export default function PurchaseOrderDetailPage() {
                 size="small"
                 startIcon={<EditIcon />}
                 onClick={() => setEditOpen(true)}
-                sx={{ borderColor: "#3b82f6", color: "#1d4ed8" }}
+                sx={{ borderColor: "var(--btn-info-border)", color: "var(--btn-info-text)" }}
               >
                 Edit PO
               </Button>
@@ -261,7 +261,7 @@ export default function PurchaseOrderDetailPage() {
                   setPayAmount(balance);
                   setPayDialogOpen(true);
                 }}
-                sx={{ borderColor: "#10b981", color: "#065f46" }}
+                sx={{ borderColor: "var(--btn-success-border)", color: "var(--btn-success-text)" }}
               >
                 Record Payment
               </Button>

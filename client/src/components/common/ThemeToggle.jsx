@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useAppTheme, PALETTES, BACKGROUNDS } from "@/theme/ThemeContext";
+import { paletteDisplay } from "@/theme/paletteUtils";
 import Popover from "@mui/material/Popover";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -59,7 +60,7 @@ export default function ThemeToggle() {
           {/* Header */}
           <div className="flex items-center justify-between px-1 pb-3">
             <div>
-              <div className="text-[13px] font-bold" style={{ color: "var(--text-primary)" }}>
+              <div className="text-[13px] font-bold font-display" style={{ color: "var(--text-primary)" }}>
                 Appearance
               </div>
               <div className="text-[10px]" style={{ color: "var(--text-tertiary)" }}>
@@ -125,13 +126,14 @@ export default function ThemeToggle() {
               Palette
             </span>
             <span className="text-[10px] font-medium" style={{ color: "var(--text-tertiary)" }}>
-              {PALETTES[palette]?.label || PALETTES.default.label}
+              {paletteDisplay(palette, resolvedMode).label}
             </span>
           </div>
 
           <div className="grid grid-cols-3 gap-1.5 mb-3">
-            {Object.entries(PALETTES).map(([key, pal]) => {
+            {Object.keys(PALETTES).map((key) => {
               const active = palette === key;
+              const pal = paletteDisplay(key, resolvedMode);
               return (
                 <button
                   key={key}
@@ -157,7 +159,7 @@ export default function ThemeToggle() {
                       boxShadow: active ? "0 0 0 2px var(--bg-surface), 0 0 0 4px var(--brand-500)" : "none",
                     }}
                   >
-                    {active && <CheckIcon sx={{ fontSize: 13, color: "#ffffff" }} />}
+                    {active && <CheckIcon sx={{ fontSize: 13, color: "rgb(var(--white-rgb))" }} />}
                   </span>
                   <span
                     className="text-[10px] font-semibold"

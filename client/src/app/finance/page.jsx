@@ -60,14 +60,14 @@ import {
 } from "recharts";
 
 const EXP_COLORS = [
-  "#2563eb",
-  "#7c3aed",
-  "#f59e0b",
-  "#10b981",
-  "#ec4899",
-  "#ef4444",
-  "#06b6d4",
-  "#64748b",
+  "var(--chart-blue)",
+  "var(--chart-violet)",
+  "var(--chart-amber)",
+  "var(--chart-emerald)",
+  "var(--chart-pink)",
+  "var(--chart-red)",
+  "var(--chart-cyan)",
+  "var(--chart-slate)",
 ];
 
 export default function FinancePage() {
@@ -423,7 +423,7 @@ export default function FinancePage() {
               size="small"
               startIcon={<FileDownloadIcon />}
               onClick={handleExport}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Export CSV
             </Button>
@@ -536,14 +536,14 @@ export default function FinancePage() {
                     <CartesianGrid
                       strokeDasharray="3 3"
                       vertical={false}
-                      stroke="#f1f5f9"
+                      stroke="var(--border-subtle)"
                     />
                     <XAxis
                       dataKey="name"
                       angle={-25}
                       textAnchor="end"
                       interval={0}
-                      tick={{ fontSize: 10, fill: "#64748b" }}
+                      tick={{ fontSize: 10, fill: "var(--chart-slate)" }}
                     />
                     <YAxis
                       tick={{ fontSize: 10 }}

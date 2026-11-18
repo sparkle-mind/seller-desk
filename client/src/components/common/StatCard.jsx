@@ -35,7 +35,7 @@ export default function StatCard({ title, value, subtitle, icon: Icon, color = "
               </Tooltip>
             )}
           </div>
-          <div className="text-xl sm:text-2xl font-bold tracking-tight truncate" style={{ color: "var(--text-primary)" }}>
+          <div className="font-display text-xl sm:text-2xl font-bold tracking-tight truncate" style={{ color: "var(--text-primary)" }}>
             {value}
           </div>
         </div>

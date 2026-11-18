@@ -192,7 +192,7 @@ export default function SupplierDetailPage() {
               size="small"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push("/suppliers-purchases")}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
@@ -210,7 +210,7 @@ export default function SupplierDetailPage() {
               size="small"
               startIcon={<PostAddIcon />}
               onClick={() => setCreatePoOpen(true)}
-              sx={{ borderColor: "#3b82f6", color: "#1d4ed8" }}
+              sx={{ borderColor: "var(--btn-info-border)", color: "var(--btn-info-text)" }}
             >
               New Purchase Order
             </Button>

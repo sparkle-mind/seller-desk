@@ -392,7 +392,7 @@ export default function OrdersPage() {
               size="small"
               startIcon={<FileDownloadIcon />}
               onClick={handleExport}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Export CSV
             </Button>

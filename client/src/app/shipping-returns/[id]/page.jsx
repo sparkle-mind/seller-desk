@@ -146,7 +146,7 @@ function ShipmentDetail({ shipment }) {
               size="small"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push("/shipping-returns")}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
@@ -330,7 +330,7 @@ function ReturnDetail({ returnRecord }) {
               size="small"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push("/shipping-returns")}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
@@ -339,7 +339,7 @@ function ReturnDetail({ returnRecord }) {
               size="small"
               startIcon={<RateReviewIcon />}
               onClick={() => setInspectionOpen(true)}
-              sx={{ borderColor: "#3b82f6", color: "#1d4ed8" }}
+              sx={{ borderColor: "var(--btn-info-border)", color: "var(--btn-info-text)" }}
             >
               Inspect Return
             </Button>
@@ -511,7 +511,7 @@ function RtoDetail({ rto }) {
               size="small"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push("/shipping-returns")}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>

@@ -20,7 +20,7 @@ function buildTheme(tokens) {
     surfaces,
   } = tokens;
 
-  return createTheme({
+  const baseOptions = {
     palette: {
       mode,
       primary: {
@@ -244,7 +244,286 @@ function buildTheme(tokens) {
         },
       },
     },
-  });
+  };
+
+  // Typography and the Lapels colour/shape layer apply to every mode; the
+  // layer reads per-mode tokens (deep-merged by createTheme).
+  return createTheme(baseOptions, buildSharedTypography(), buildLapelsOverrides(tokens));
+}
+
+// ─── Typography: all modes ──────────────────────────────────────────────────
+// Instrument Sans body + Alegreya serif display, with the same sizes, weights
+// and tracking in light and dark. Contains no colours.
+function buildSharedTypography() {
+  const display = "var(--font-display)";
+  const body = "var(--font-sans)";
+
+  return {
+    typography: {
+      fontFamily: body,
+      h1: { fontFamily: display, fontWeight: 500, letterSpacing: "-0.012em" },
+      h2: { fontFamily: display, fontWeight: 500, letterSpacing: "-0.01em" },
+      h3: { fontFamily: display, fontWeight: 600, letterSpacing: "-0.005em" },
+      h4: { fontFamily: display, fontWeight: 600 },
+      h5: { fontFamily: display, fontWeight: 600 },
+      h6: { fontFamily: display, fontWeight: 600 },
+      overline: { letterSpacing: "0.16em", fontWeight: 600 },
+      button: { fontFamily: body, fontWeight: 600, letterSpacing: "0.01em" },
+    },
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          body: { fontFamily: body },
+        },
+      },
+      MuiDialogTitle: {
+        styleOverrides: {
+          root: {
+            fontFamily: display,
+            fontWeight: 600,
+            fontSize: "1.3rem",
+            letterSpacing: "-0.005em",
+            paddingTop: 22,
+          },
+        },
+      },
+      MuiTab: {
+        styleOverrides: {
+          root: {
+            fontWeight: 500,
+            letterSpacing: "0.01em",
+            "&.Mui-selected": { fontWeight: 600 },
+          },
+        },
+      },
+      MuiTooltip: {
+        styleOverrides: {
+          tooltip: { fontSize: 11.5, letterSpacing: "0.01em" },
+        },
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          head: {
+            fontWeight: 600,
+            textTransform: "uppercase",
+            letterSpacing: "0.12em",
+            fontSize: 11,
+          },
+        },
+      },
+    },
+  };
+}
+
+// ─── "Lapels" colours & shapes (light + dark) ──────────────────────────────
+// Tailored pill buttons, hairline warm borders, flat surfaces and muted
+// earthy status colours. All colours come from the per-mode tokens.
+function buildLapelsOverrides(tokens) {
+  const { isDark, primary, primaryDark, contrastText, surfaces, accent } = tokens;
+  const ring = tokens.cssVars["--brand-ring"];
+  // Hover/selected washes: espresso on linen, cream on black.
+  const ink = (a) => (isDark ? `rgba(241, 232, 216, ${a})` : `rgba(42, 37, 31, ${a})`);
+  const statusInk = isDark ? "#120f0b" : surfaces.surface;
+  const status = isDark
+    ? {
+        success: { main: "#8fae7a", light: "#18200f", dark: "#c4d3b5" },
+        warning: { main: "#d4a55a", light: "#231a0c", dark: "#e7cf97" },
+        error: { main: "#cf7a62", light: "#26120d", dark: "#e5b9aa" },
+        info: { main: "#8fa6bf", light: "#121820", dark: "#c3cad8" },
+      }
+    : {
+        success: { main: "#5f8249", light: "#eef2e8", dark: "#3c552e" },
+        warning: { main: "#b2822e", light: "#f9f2e3", dark: "#79531e" },
+        error: { main: "#a85741", light: "#f8ece7", dark: "#74382a" },
+        info: { main: "#5b6f86", light: "#edf0f3", dark: "#3e4d5f" },
+      };
+
+  return {
+    palette: {
+      secondary: {
+        main: surfaces.textPrimary,
+        light: surfaces.textSecondary,
+        dark: isDark ? "#ffffff" : "#1a1612",
+        contrastText: surfaces.base,
+      },
+      success: { ...status.success, contrastText: statusInk },
+      warning: { ...status.warning, contrastText: statusInk },
+      error: { ...status.error, contrastText: statusInk },
+      info: { ...status.info, contrastText: statusInk },
+      action: {
+        hover: ink(0.04),
+        selected: ink(0.07),
+      },
+    },
+    shape: { borderRadius: 6 },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 999,
+            paddingInline: 18,
+            transition: "background-color .2s ease, border-color .2s ease, color .2s ease",
+          },
+          sizeSmall: { paddingInline: 14 },
+          sizeLarge: { paddingInline: 24 },
+          contained: {
+            "&:hover": { boxShadow: "none" },
+          },
+          containedPrimary: {
+            color: contrastText,
+            "&:hover": { backgroundColor: primaryDark, boxShadow: "none" },
+          },
+          outlined: {
+            borderColor: surfaces.borderStrong,
+            "&:hover": {
+              borderColor: surfaces.textSecondary,
+              backgroundColor: ink(0.035),
+            },
+          },
+          outlinedInherit: {
+            borderColor: surfaces.borderStrong,
+            color: surfaces.textPrimary,
+          },
+          outlinedPrimary: {
+            borderColor: tokens.cssVars["--brand-border"],
+            color: primaryDark,
+            "&:hover": {
+              borderColor: primary,
+              backgroundColor: tokens.cssVars["--brand-soft"],
+            },
+          },
+          text: {
+            "&:hover": { backgroundColor: ink(0.04) },
+          },
+        },
+      },
+      MuiIconButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 999,
+            "&:hover": { backgroundColor: ink(0.05) },
+          },
+        },
+      },
+      MuiMenu: {
+        styleOverrides: {
+          paper: { borderRadius: 10, marginTop: 6 },
+          list: { padding: 6 },
+        },
+      },
+      MuiPopover: {
+        styleOverrides: {
+          paper: { borderRadius: 12 },
+        },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: {
+            borderRadius: 6,
+            "&:hover": { backgroundColor: surfaces.surface2 },
+            "&.Mui-selected": {
+              backgroundColor: tokens.cssVars["--brand-soft"],
+              "&:hover": { backgroundColor: tokens.cssVars["--brand-soft-strong"] },
+            },
+          },
+        },
+      },
+      MuiDialog: {
+        styleOverrides: {
+          paper: { borderRadius: 14 },
+        },
+      },
+      MuiDialogActions: {
+        styleOverrides: {
+          root: { borderTop: `1px solid ${surfaces.borderSubtle}` },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: { borderRadius: 999, fontWeight: 600 },
+        },
+      },
+      MuiTabs: {
+        styleOverrides: {
+          root: { borderBottom: `1px solid ${surfaces.border}` },
+          indicator: {
+            height: 2,
+            borderRadius: 0,
+            backgroundColor: surfaces.textPrimary,
+          },
+        },
+      },
+      MuiTab: {
+        styleOverrides: {
+          root: {
+            "&.Mui-selected": { color: surfaces.textPrimary },
+            "&:hover": { color: surfaces.textPrimary },
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            borderRadius: 6,
+            "& .MuiOutlinedInput-notchedOutline": { borderColor: surfaces.border },
+            "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: surfaces.borderStrong },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: primary,
+              boxShadow: `0 0 0 3px ${ring}`,
+            },
+            "&.Mui-disabled": { backgroundColor: surfaces.surface2 },
+          },
+        },
+      },
+      MuiInputLabel: {
+        styleOverrides: {
+          root: { "&.Mui-focused": { color: primaryDark } },
+        },
+      },
+      MuiCheckbox: {
+        styleOverrides: {
+          root: { color: surfaces.borderStrong },
+        },
+      },
+      MuiSwitch: {
+        styleOverrides: {
+          track: { backgroundColor: surfaces.borderStrong },
+        },
+      },
+      MuiTooltip: {
+        styleOverrides: {
+          tooltip: {
+            backgroundColor: surfaces.textPrimary,
+            color: surfaces.surface,
+            border: "none",
+            borderRadius: 4,
+          },
+          arrow: { color: surfaces.textPrimary },
+        },
+      },
+      MuiLinearProgress: {
+        styleOverrides: {
+          root: { borderRadius: 999, backgroundColor: surfaces.surface3 },
+        },
+      },
+      MuiBadge: {
+        styleOverrides: {
+          dot: { backgroundColor: accent },
+        },
+      },
+      MuiAlert: {
+        styleOverrides: {
+          root: { borderRadius: 8, border: `1px solid ${surfaces.border}` },
+        },
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          root: { borderColor: surfaces.borderSubtle },
+          head: { color: surfaces.textTertiary },
+        },
+      },
+    },
+  };
 }
 
 // ─── Inner provider that reads from ThemeContext ──────────────────────────────

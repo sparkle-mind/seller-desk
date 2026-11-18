@@ -119,7 +119,7 @@ export default function OrderDetailPage() {
               size="small"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push("/orders")}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
@@ -129,7 +129,7 @@ export default function OrderDetailPage() {
               size="small"
               startIcon={<PrintIcon />}
               onClick={handlePrint}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Print
             </Button>
@@ -140,7 +140,7 @@ export default function OrderDetailPage() {
               size="small"
               startIcon={<EditIcon />}
               onClick={() => setEditOpen(true)}
-              sx={{ borderColor: "#3b82f6", color: "#1d4ed8" }}
+              sx={{ borderColor: "var(--btn-info-border)", color: "var(--btn-info-text)" }}
             >
               Edit
             </Button>
@@ -180,7 +180,7 @@ export default function OrderDetailPage() {
                 size="small"
                 startIcon={<AssignmentReturnIcon />}
                 onClick={() => setReturnOpen(true)}
-                sx={{ borderColor: "#f59e0b", color: "#b45309" }}
+                sx={{ borderColor: "var(--btn-warning-border)", color: "var(--btn-warning-text)" }}
               >
                 Mark Returned
               </Button>

@@ -88,7 +88,10 @@ export default function AppSidebar({ onClose }) {
             <StorefrontIcon sx={{ fontSize: 21 }} />
           </div>
           <div>
-            <div className="font-bold text-white tracking-tight text-[15px] leading-tight">
+            <div
+              className="sd-wordmark font-bold tracking-tight text-[15px] leading-tight"
+              style={{ color: "var(--sidebar-title)" }}
+            >
               SellerDesk
             </div>
             <div
@@ -106,7 +109,7 @@ export default function AppSidebar({ onClose }) {
         className="px-5 py-3"
         style={{
           borderBottom: "1px solid var(--sidebar-border)",
-          backgroundColor: "rgba(0,0,0,0.12)",
+          backgroundColor: "var(--sidebar-panel)",
         }}
       >
         <div
@@ -119,9 +122,9 @@ export default function AppSidebar({ onClose }) {
           <span
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border"
             style={{
-              backgroundColor: "rgba(236, 72, 153, 0.12)",
-              color: "#f9a8d4",
-              borderColor: "rgba(236, 72, 153, 0.28)",
+              backgroundColor: "var(--chip-meesho-bg)",
+              color: "var(--chip-meesho-text)",
+              borderColor: "var(--chip-meesho-border)",
             }}
           >
             <span className="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse" />
@@ -130,14 +133,14 @@ export default function AppSidebar({ onClose }) {
           <span
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-semibold border"
             style={{
-              backgroundColor: "rgba(40, 116, 240, 0.12)",
-              color: "#8ab4ff",
-              borderColor: "rgba(40, 116, 240, 0.3)",
+              backgroundColor: "var(--chip-flipkart-bg)",
+              color: "var(--chip-flipkart-text)",
+              borderColor: "var(--chip-flipkart-border)",
             }}
           >
             <span
               className="w-1.5 h-1.5 rounded-full"
-              style={{ backgroundColor: "#2874f0" }}
+              style={{ backgroundColor: "var(--chip-flipkart-dot)" }}
             />
             Flipkart
           </span>
@@ -175,7 +178,7 @@ export default function AppSidebar({ onClose }) {
                 <span
                   className="ml-auto w-1.5 h-1.5 rounded-full shrink-0"
                   style={{
-                    backgroundColor: "var(--sidebar-active-text)",
+                    backgroundColor: "var(--sidebar-active-indicator)",
                     boxShadow: "0 0 0 3px var(--sidebar-active-bg)",
                   }}
                 />
@@ -190,7 +193,7 @@ export default function AppSidebar({ onClose }) {
         className="p-4 space-y-3"
         style={{
           borderTop: "1px solid var(--sidebar-border)",
-          backgroundColor: "rgba(0,0,0,0.16)",
+          backgroundColor: "var(--sidebar-footer)",
         }}
       >
         <button
@@ -199,8 +202,8 @@ export default function AppSidebar({ onClose }) {
           className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition hover:brightness-110"
           style={{
             color: "var(--sidebar-text)",
-            backgroundColor: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.08)",
+            backgroundColor: "var(--sidebar-btn-bg)",
+            border: "1px solid var(--sidebar-btn-border)",
           }}
         >
           <RestartAltIcon sx={{ fontSize: 15 }} className="text-amber-400" />
@@ -222,13 +225,16 @@ export default function AppSidebar({ onClose }) {
             <span
               className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2"
               style={{
-                backgroundColor: "#10b981",
+                backgroundColor: "rgb(var(--emerald-500-rgb))",
                 borderColor: "var(--sidebar-bg)",
               }}
             />
           </div>
           <div className="overflow-hidden">
-            <div className="text-xs font-semibold text-white truncate">
+            <div
+              className="text-xs font-semibold truncate"
+              style={{ color: "var(--sidebar-title)" }}
+            >
               Vikram Malhotra
             </div>
             <div

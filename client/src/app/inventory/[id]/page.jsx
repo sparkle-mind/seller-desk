@@ -180,7 +180,7 @@ export default function InventoryDetailPage() {
               size="small"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push("/inventory")}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
@@ -200,7 +200,7 @@ export default function InventoryDetailPage() {
                 setNewReorderValue(product.reorderLevel || 15);
                 setReorderDialogOpen(true);
               }}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Configure Threshold
             </Button>

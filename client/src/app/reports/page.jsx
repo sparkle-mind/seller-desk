@@ -54,7 +54,7 @@ const REPORT_TABS = [
   "Supplier Purchases",
 ];
 
-const COLORS = ["#2563eb", "#ec4899", "#10b981", "#f59e0b", "#8b5cf6", "#06b6d4"];
+const COLORS = ["var(--chart-blue)", "var(--chart-pink)", "var(--chart-emerald)", "var(--chart-amber)", "var(--chart-purple)", "var(--chart-cyan)"];
 
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState(0);
@@ -238,7 +238,7 @@ export default function ReportsPage() {
               size="small"
               startIcon={<PrintIcon />}
               onClick={handlePrint}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Print Report
             </Button>
@@ -326,13 +326,13 @@ export default function ReportsPage() {
                   ]}
                   margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
                   <XAxis dataKey="day" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${v / 1000}k`} />
                   <RechartsTooltip formatter={(v) => formatCurrency(v)} />
                   <Legend />
-                  <Bar dataKey="meesho" name="Meesho Sales" fill="#ec4899" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="flipkart" name="Flipkart Sales" fill="#2563eb" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="meesho" name="Meesho Sales" fill="var(--chart-meesho)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="flipkart" name="Flipkart Sales" fill="var(--chart-flipkart)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -357,13 +357,13 @@ export default function ReportsPage() {
                   }))}
                   margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${v / 1000}k`} />
                   <RechartsTooltip formatter={(v) => formatCurrency(v)} />
                   <Legend />
-                  <Bar dataKey="revenue" name="Total Revenue (₹)" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="profit" name="Gross Profit (₹)" fill="#10b981" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="revenue" name="Total Revenue (₹)" fill="var(--chart-blue-2)" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="profit" name="Gross Profit (₹)" fill="var(--chart-emerald)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -435,8 +435,8 @@ export default function ReportsPage() {
                     paddingAngle={4}
                     dataKey="value"
                   >
-                    <Cell fill="#ec4899" />
-                    <Cell fill="#2563eb" />
+                    <Cell fill="var(--chart-meesho)" />
+                    <Cell fill="var(--chart-flipkart)" />
                   </Pie>
                   <RechartsTooltip formatter={(v) => formatCurrency(v)} />
                   <Legend />
@@ -525,11 +525,11 @@ export default function ReportsPage() {
                   ]}
                   margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
                   <XAxis dataKey="reason" angle={-15} textAnchor="end" tick={{ fontSize: 10 }} />
                   <YAxis tick={{ fontSize: 10 }} />
                   <RechartsTooltip />
-                  <Bar dataKey="count" name="Count" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="count" name="Count" fill="var(--chart-red)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

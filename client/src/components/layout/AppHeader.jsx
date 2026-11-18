@@ -53,7 +53,7 @@ export default function AppHeader({ onMenuToggle }) {
           >
             <StorefrontIcon sx={{ fontSize: 18 }} />
           </span>
-          <span className="text-sm font-bold tracking-tight truncate" style={{ color: "var(--text-primary)" }}>
+          <span className="sd-wordmark text-sm font-bold tracking-tight truncate" style={{ color: "var(--text-primary)" }}>
             SellerDesk
           </span>
         </Link>
@@ -73,9 +73,9 @@ export default function AppHeader({ onMenuToggle }) {
           style={{ backgroundColor: "var(--bg-surface2)", border: "1px solid var(--border)" }}
         >
           <span style={{ color: "var(--text-tertiary)" }}>Sync:</span>
-          <span className="font-semibold" style={{ color: "#ec4899" }}>Meesho</span>
+          <span className="font-semibold" style={{ color: "var(--chart-meesho)" }}>Meesho</span>
           <span style={{ color: "var(--border)" }}>&</span>
-          <span className="font-semibold text-[#2874f0] dark:text-[#8ab4ff]">Flipkart</span>
+          <span className="font-semibold" style={{ color: "var(--flipkart-text)" }}>Flipkart</span>
         </div>
 
         {/* Theme toggle */}
@@ -105,8 +105,8 @@ export default function AppHeader({ onMenuToggle }) {
           </div>
           {[
             { title: "New Flipkart Order OD40923488210", sub: "1x Fast Charging Power Bank received", color: "var(--text-primary)" },
-            { title: "Low Stock: Kolhapuri Sandals", sub: "SKU-FTW-011 is out of stock", color: "#d97706" },
-            { title: "Meesho Settlement Payout", sub: "₹70,848 credited for cycle Feb 15-21", color: "#10b981" },
+            { title: "Low Stock: Kolhapuri Sandals", sub: "SKU-FTW-011 is out of stock", color: "rgb(var(--amber-600-rgb))" },
+            { title: "Meesho Settlement Payout", sub: "₹70,848 credited for cycle Feb 15-21", color: "rgb(var(--emerald-500-rgb))" },
           ].map((n, i) => (
             <MenuItem key={i} onClick={() => setNotifAnchorEl(null)}>
               <div>

@@ -34,7 +34,7 @@ export default function AppLayout({ children }) {
       {/* Desktop Sidebar */}
       <aside
         className="hidden lg:block  w-64  shrink-0 fixed inset-y-0 left-0 z-40"
-        style={{ boxShadow: "0 24px 60px -32px rgba(0,0,0,0.55)" }}
+        style={{ boxShadow: "var(--sidebar-elevation)" }}
       >
         <AppSidebar />
       </aside>

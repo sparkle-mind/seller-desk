@@ -70,7 +70,7 @@ export default function StatusChip({ status, type = "default", size = "small" })
         };
       case "flipkart":
         return {
-          bg: "bg-flipkart/10 text-[#2874f0] dark:text-[#8ab4ff] border-flipkart/25 font-semibold",
+          bg: "bg-flipkart/10 text-[color:var(--flipkart-text)] border-flipkart/25 font-semibold",
           dot: "bg-flipkart",
         };
 

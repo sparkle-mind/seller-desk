@@ -42,7 +42,7 @@ import {
   Line,
 } from "recharts";
 
-const PIE_COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#8b5cf6", "#ef4444", "#ec4899"];
+const PIE_COLORS = ["var(--chart-emerald)", "var(--chart-blue-2)", "var(--chart-amber)", "var(--chart-purple)", "var(--chart-red)", "var(--chart-pink)"];
 
 export default function DashboardPage() {
   const [dateRange, setDateRange] = useState("all");
@@ -224,7 +224,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Action Buttons */}
-      <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl p-4 sm:p-5 text-white flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 shadow-sm">
+      <div className="sd-feature-band bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl p-4 sm:p-5 text-white flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 shadow-sm">
         <div>
           <h3 className="text-sm font-bold text-white">Quick Operations</h3>
           <p className="text-xs text-slate-300">
@@ -284,23 +284,23 @@ export default function DashboardPage() {
           <div className="h-64 sm:h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={monthlyTrendsData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#64748b" }} />
-                <YAxis tick={{ fontSize: 11, fill: "#64748b" }} tickFormatter={(v) => `₹${v / 1000}k`} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "var(--chart-slate)" }} />
+                <YAxis tick={{ fontSize: 11, fill: "var(--chart-slate)" }} tickFormatter={(v) => `₹${v / 1000}k`} />
                 <RechartsTooltip
                   formatter={(val) => formatCurrency(val)}
                   contentStyle={{
-                    backgroundColor: "#0f172a",
-                    borderColor: "#1e293b",
-                    color: "#fff",
+                    backgroundColor: "var(--chart-tooltip-bg)",
+                    borderColor: "var(--chart-tooltip-border)",
+                    color: "var(--chart-tooltip-text)",
                     borderRadius: "8px",
                     fontSize: "12px",
                   }}
                 />
                 <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }} />
                 <Bar dataKey="sales" name="Gross Sales" fill="var(--brand-500)" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="expenses" name="Expenses" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="profit" name="Net Profit" fill="#10b981" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="expenses" name="Expenses" fill="var(--chart-amber)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="profit" name="Net Profit" fill="var(--chart-emerald)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -338,8 +338,8 @@ export default function DashboardPage() {
                 </Pie>
                 <RechartsTooltip
                   contentStyle={{
-                    backgroundColor: "#0f172a",
-                    color: "#fff",
+                    backgroundColor: "var(--chart-tooltip-bg)",
+                    color: "var(--chart-tooltip-text)",
                     borderRadius: "8px",
                     fontSize: "12px",
                   }}
@@ -412,11 +412,11 @@ export default function DashboardPage() {
                 ]}
                 margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
               >
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border-subtle)" />
                 <XAxis type="number" tick={{ fontSize: 11 }} tickFormatter={(v) => `₹${v / 1000}k`} />
                 <YAxis dataKey="name" type="category" tick={{ fontSize: 11, fontWeight: 600 }} />
                 <RechartsTooltip formatter={(v) => formatCurrency(v)} />
-                <Bar dataKey="sales" name="Gross Sales (₹)" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+                <Bar dataKey="sales" name="Gross Sales (₹)" fill="var(--chart-blue-2)" radius={[0, 4, 4, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>

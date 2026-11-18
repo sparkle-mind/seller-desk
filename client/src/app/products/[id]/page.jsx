@@ -82,7 +82,7 @@ export default function ProductDetailPage() {
               size="small"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push("/products")}
-              sx={{ borderColor: "#cbd5e1", color: "#334155" }}
+              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
