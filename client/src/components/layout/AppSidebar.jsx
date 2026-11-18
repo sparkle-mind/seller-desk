@@ -176,7 +176,7 @@ export default function AppSidebar({ onClose }) {
               <span className="truncate">{item.name}</span>
               {isActive && (
                 <span
-                  className="ml-auto w-1.5 h-1.5 rounded-full shrink-0"
+                  className="sd-pop-in ml-auto w-1.5 h-1.5 rounded-full shrink-0"
                   style={{
                     backgroundColor: "var(--sidebar-active-indicator)",
                     boxShadow: "0 0 0 3px var(--sidebar-active-bg)",

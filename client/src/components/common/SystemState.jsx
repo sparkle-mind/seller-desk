@@ -19,7 +19,7 @@ export default function SystemState({
   return (
     <div className="flex min-h-[65vh] items-center justify-center py-10 sm:py-16">
       <section
-        className="relative w-full max-w-xl overflow-hidden rounded-3xl p-7 text-center sm:p-11"
+        className="sd-rise-in relative w-full max-w-xl overflow-hidden rounded-3xl p-7 text-center sm:p-11"
         style={{
           backgroundColor: "var(--bg-surface)",
           border: "1px solid var(--border)",
@@ -50,7 +50,7 @@ export default function SystemState({
           </Link>
 
           <div
-            className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
+            className="sd-float mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl"
             style={{
               backgroundColor: "var(--brand-soft)",
               color: "var(--brand-text)",

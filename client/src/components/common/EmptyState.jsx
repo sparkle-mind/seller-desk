@@ -13,11 +13,11 @@ export default function EmptyState({
 }) {
   return (
     <div
-      className="flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-xl border border-dashed my-4"
+      className="sd-empty flex flex-col items-center justify-center p-8 sm:p-12 text-center rounded-xl border border-dashed my-4"
       style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border)" }}
     >
       <div
-        className="w-12 h-12 rounded-full flex items-center justify-center mb-3"
+        className="sd-empty-icon w-12 h-12 rounded-full flex items-center justify-center mb-3"
         style={{ backgroundColor: "var(--brand-soft)", color: "var(--brand-text)" }}
       >
         <Icon sx={{ fontSize: 28 }} />

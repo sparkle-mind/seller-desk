@@ -58,7 +58,7 @@ export default function AppHeader({ onMenuToggle }) {
           </span>
         </Link>
         <div className="hidden lg:flex items-center gap-2 text-xs font-medium" style={{ color: "var(--text-tertiary)" }}>
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="sd-live-dot w-2 h-2 rounded-full bg-emerald-500" />
           <span style={{ color: "var(--text-secondary)" }}>System Online</span>
           <span style={{ color: "var(--border)" }}>•</span>
           <span>{todayStr}</span>
@@ -87,7 +87,7 @@ export default function AppHeader({ onMenuToggle }) {
           onClick={(e) => setNotifAnchorEl(e.currentTarget)}
           className="p-2 sd-icon-btn"
         >
-          <Badge badgeContent={3} color="primary" variant="dot">
+          <Badge badgeContent={3} color="primary" variant="dot" className="sd-notif-badge">
             <NotificationsNoneIcon sx={{ fontSize: 22 }} />
           </Badge>
         </button>

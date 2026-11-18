@@ -3,7 +3,6 @@
 import React, { useState, useMemo } from "react";
 import TablePagination from "@mui/material/TablePagination";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import EmptyState from "./EmptyState";
 
 export default function DataTable({
@@ -75,14 +74,14 @@ export default function DataTable({
                     <div className={`inline-flex items-center gap-1 ${col.align === "right" ? "justify-end" : ""}`}>
                       <span>{col.label}</span>
                       {col.sortable && (
-                        <span style={{ color: isSorted ? "var(--brand-500)" : "var(--border)" }}>
-                          {isSorted ? (
-                            sortDir === "asc"
-                              ? <ArrowUpwardIcon sx={{ fontSize: 13 }} />
-                              : <ArrowDownwardIcon sx={{ fontSize: 13 }} />
-                          ) : (
-                            <ArrowUpwardIcon sx={{ fontSize: 13, opacity: 0.35 }} />
-                          )}
+                        <span
+                          className={`sd-sort-icon ${isSorted && sortDir === "desc" ? "is-desc" : ""}`}
+                          style={{
+                            color: isSorted ? "var(--brand-500)" : "var(--border)",
+                            opacity: isSorted ? 1 : 0.35,
+                          }}
+                        >
+                          <ArrowUpwardIcon sx={{ fontSize: 13 }} />
                         </span>
                       )}
                     </div>
@@ -91,12 +90,13 @@ export default function DataTable({
               })}
             </tr>
           </thead>
-          <tbody>
+          {/* Keyed on view state so rows cascade in again on page/sort change */}
+          <tbody key={`${page}-${rowsPerPage}-${sortKey}-${sortDir}`}>
             {paginatedData.map((row, idx) => (
               <tr
                 key={row[keyField] || idx}
                 onClick={() => onRowClick && onRowClick(row)}
-                className={`transition-colors duration-100 ${onRowClick ? "cursor-pointer" : ""}`}
+                className={`sd-row transition-colors duration-150 ${onRowClick ? "cursor-pointer" : ""}`}
                 style={{ borderBottom: "1px solid var(--border-subtle)" }}
                 onMouseEnter={(e) => { if (onRowClick) e.currentTarget.style.backgroundColor = "var(--bg-surface2)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = ""; }}

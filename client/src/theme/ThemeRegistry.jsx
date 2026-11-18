@@ -248,7 +248,80 @@ function buildTheme(tokens) {
 
   // Typography and the Lapels colour/shape layer apply to every mode; the
   // layer reads per-mode tokens (deep-merged by createTheme).
-  return createTheme(baseOptions, buildSharedTypography(), buildLapelsOverrides(tokens));
+  return createTheme(
+    baseOptions,
+    buildSharedTypography(),
+    buildLapelsOverrides(tokens),
+    buildMotionOverrides(),
+  );
+}
+
+// ─── Motion: all modes ──────────────────────────────────────────────────────
+// Short, transform/opacity-only transitions layered over every MUI component.
+// Keyframes (sd-dialog-in, sd-rise-sm) live in globals.css; reduced-motion
+// users get them disabled there.
+function buildMotionOverrides() {
+  const easeOut = "cubic-bezier(0.22, 1, 0.36, 1)";
+  const press = {
+    transition: `background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 200ms ${easeOut}, transform 150ms ease`,
+    "&:active": { transform: "scale(0.97)" },
+  };
+
+  return {
+    transitions: {
+      easing: { easeOut },
+    },
+    components: {
+      MuiButton: { styleOverrides: { root: press } },
+      MuiIconButton: {
+        styleOverrides: {
+          root: { ...press, "&:active": { transform: "scale(0.92)" } },
+        },
+      },
+      MuiDialog: {
+        defaultProps: { transitionDuration: { enter: 240, exit: 160 } },
+        styleOverrides: {
+          paper: { animation: `sd-dialog-in 280ms ${easeOut} both` },
+        },
+      },
+      MuiMenu: {
+        defaultProps: { transitionDuration: { enter: 200, exit: 120 } },
+      },
+      MuiPopover: {
+        defaultProps: { transitionDuration: { enter: 200, exit: 120 } },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: { transition: "background-color 120ms ease" },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            "& .MuiOutlinedInput-notchedOutline": {
+              transition: "border-color 160ms ease, box-shadow 200ms ease",
+            },
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: { transition: "background-color 150ms ease, transform 150ms ease" },
+          clickable: { "&:active": { transform: "scale(0.95)", boxShadow: "none" } },
+        },
+      },
+      MuiTab: {
+        styleOverrides: {
+          root: { transition: "color 180ms ease" },
+        },
+      },
+      MuiAlert: {
+        styleOverrides: {
+          root: { animation: `sd-rise-sm 260ms ${easeOut} both` },
+        },
+      },
+    },
+  };
 }
 
 // ─── Typography: all modes ──────────────────────────────────────────────────

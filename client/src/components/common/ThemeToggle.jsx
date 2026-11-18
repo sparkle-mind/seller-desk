@@ -31,11 +31,14 @@ export default function ThemeToggle() {
         className="p-2 sd-icon-btn"
         aria-label="Theme settings"
       >
-        {resolvedMode === "dark" ? (
-          <DarkModeOutlinedIcon sx={{ fontSize: 21 }} />
-        ) : (
-          <LightModeOutlinedIcon sx={{ fontSize: 21 }} />
-        )}
+        {/* Keyed so the icon spins in whenever the resolved mode flips */}
+        <span key={resolvedMode} className="sd-spin-in">
+          {resolvedMode === "dark" ? (
+            <DarkModeOutlinedIcon sx={{ fontSize: 21 }} />
+          ) : (
+            <LightModeOutlinedIcon sx={{ fontSize: 21 }} />
+          )}
+        </span>
       </button>
 
       <Popover

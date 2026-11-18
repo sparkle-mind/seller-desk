@@ -46,7 +46,7 @@ export default function RecordCardView({
             }
           }}
           tabIndex={onCardClick ? 0 : undefined}
-          className={`rounded-2xl p-4 ${onCardClick ? "cursor-pointer" : ""}`}
+          className={`sd-stagger-item rounded-2xl p-4 ${onCardClick ? "sd-hover-card cursor-pointer" : ""}`}
           style={{
             backgroundColor: "var(--bg-surface)",
             border: "1px solid var(--border)",

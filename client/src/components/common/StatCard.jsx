@@ -18,7 +18,7 @@ export default function StatCard({ title, value, subtitle, icon: Icon, color = "
 
   return (
     <div
-      className="rounded-2xl p-4 sm:p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--brand-border)] flex flex-col justify-between"
+      className="sd-stagger-item sd-hover-card rounded-2xl p-4 sm:p-5 flex flex-col justify-between"
       style={{
         backgroundColor: "var(--bg-surface)",
         border: "1px solid var(--border)",
@@ -40,7 +40,7 @@ export default function StatCard({ title, value, subtitle, icon: Icon, color = "
           </div>
         </div>
         {Icon && (
-          <div className={`p-2.5 rounded-xl shrink-0 ${scheme.bg} ring-1 ${scheme.ring}`}>
+          <div className={`sd-hover-icon p-2.5 rounded-xl shrink-0 ${scheme.bg} ring-1 ${scheme.ring}`}>
             <Icon sx={{ fontSize: 22 }} className={scheme.icon} />
           </div>
         )}

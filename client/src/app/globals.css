@@ -1166,10 +1166,226 @@ html.dark #__next-root .sd-feature-band .bg-slate-700:hover {
   fill: var(--text-tertiary) !important;
 }
 
-/* ── Motion ─────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════
+   MOTION
+   CSS-only, GPU-friendly (transform + opacity). Every entrance runs
+   once on mount; nothing loops except tiny status indicators.
+═══════════════════════════════════════════════════════════════════ */
+:root {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --motion-fast: 150ms;
+  --motion-base: 240ms;
+  --motion-slow: 420ms;
+}
+
+@keyframes sd-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes sd-rise {
+  from { opacity: 0; transform: translate3d(0, 10px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes sd-rise-sm {
+  from { opacity: 0; transform: translate3d(0, 4px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes sd-pop {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes sd-dialog-in {
+  from { opacity: 0; transform: translate3d(0, 12px, 0) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes sd-spin-in {
+  from { opacity: 0; transform: rotate(-90deg) scale(0.6); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes sd-float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+@keyframes sd-ping {
+  0%        { transform: scale(1); opacity: 0.55; }
+  80%, 100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* Page enter (app/template.jsx remounts on every navigation) */
+.sd-page {
+  animation: sd-fade var(--motion-base) ease-out both;
+}
+.sd-page > div > * {
+  animation: sd-rise var(--motion-slow) var(--ease-out) both;
+}
+.sd-page > div > :nth-child(2) { animation-delay: 50ms; }
+.sd-page > div > :nth-child(3) { animation-delay: 100ms; }
+.sd-page > div > :nth-child(4) { animation-delay: 150ms; }
+.sd-page > div > :nth-child(5) { animation-delay: 200ms; }
+.sd-page > div > :nth-child(n + 6) { animation-delay: 240ms; }
+
+/* Staggered cards (stat tiles, record cards) */
+.sd-stagger-item {
+  animation: sd-rise var(--motion-slow) var(--ease-out) both;
+  animation-delay: 60ms;
+}
+.sd-stagger-item:nth-child(2) { animation-delay: 100ms; }
+.sd-stagger-item:nth-child(3) { animation-delay: 140ms; }
+.sd-stagger-item:nth-child(4) { animation-delay: 180ms; }
+.sd-stagger-item:nth-child(5) { animation-delay: 220ms; }
+.sd-stagger-item:nth-child(6) { animation-delay: 260ms; }
+.sd-stagger-item:nth-child(n + 7) { animation-delay: 300ms; }
+
+/* Interactive cards: lift on hover, settle on press */
+.sd-hover-card {
+  transition:
+    transform var(--motion-base) var(--ease-out),
+    box-shadow var(--motion-base) var(--ease-out),
+    border-color var(--motion-fast) ease;
+}
+.sd-hover-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--brand-border) !important;
+  box-shadow: var(--shadow-popover) !important;
+}
+.sd-hover-card.cursor-pointer:active {
+  transform: translateY(0) scale(0.99);
+  transition-duration: var(--motion-fast);
+}
+.sd-hover-card .sd-hover-icon {
+  transition: transform var(--motion-base) var(--ease-spring);
+}
+.sd-hover-card:hover .sd-hover-icon {
+  transform: scale(1.08) rotate(-4deg);
+}
+
+/* Table rows: quick cascade on mount, page change and sort */
+.sd-row {
+  animation: sd-rise-sm 260ms var(--ease-out) both;
+}
+.sd-row:nth-child(2)  { animation-delay: 15ms; }
+.sd-row:nth-child(3)  { animation-delay: 30ms; }
+.sd-row:nth-child(4)  { animation-delay: 45ms; }
+.sd-row:nth-child(5)  { animation-delay: 60ms; }
+.sd-row:nth-child(6)  { animation-delay: 75ms; }
+.sd-row:nth-child(7)  { animation-delay: 90ms; }
+.sd-row:nth-child(8)  { animation-delay: 105ms; }
+.sd-row:nth-child(9)  { animation-delay: 120ms; }
+.sd-row:nth-child(n + 10) { animation-delay: 135ms; }
+
+.sd-sort-icon {
+  display: inline-flex;
+  transition: transform var(--motion-base) var(--ease-out), opacity var(--motion-fast) ease;
+}
+.sd-sort-icon.is-desc {
+  transform: rotate(180deg);
+}
+
+/* One-off entrances */
+.sd-pop-in   { animation: sd-pop var(--motion-base) var(--ease-out) both; }
+.sd-rise-in  { animation: sd-rise var(--motion-slow) var(--ease-out) both; }
+.sd-spin-in  { display: inline-flex; animation: sd-spin-in 360ms var(--ease-spring) both; }
+.sd-float    { animation: sd-float 3.2s ease-in-out infinite; }
+
+/* Empty state: card rises, icon pops in after it */
+.sd-empty {
+  animation: sd-rise var(--motion-slow) var(--ease-out) both;
+}
+.sd-empty .sd-empty-icon {
+  animation: sd-pop var(--motion-slow) var(--ease-spring) 120ms both;
+}
+
+/* Live / attention dots: a soft ping ring behind the dot */
+.sd-live-dot {
+  position: relative;
+}
+.sd-live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: sd-ping 2.4s var(--ease-out) infinite;
+}
+.sd-notif-badge .MuiBadge-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: sd-ping 1.8s var(--ease-out) 1s 3;
+}
+
+/* Header icon buttons + sidebar nav micro-interactions */
+:root .sd-icon-btn {
+  transition:
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+}
+:root .sd-icon-btn:active {
+  transform: scale(0.92);
+}
+.sd-nav-link svg {
+  transition: color var(--motion-fast) ease, transform var(--motion-base) var(--ease-spring);
+}
+.sd-nav-link:hover svg {
+  transform: scale(1.1);
+}
+.sd-nav-link:active {
+  transform: scale(0.98);
+}
+
+/* Mobile bottom nav: sliding indicator + icon lift on the active item */
+.sd-mobile-nav-item {
+  position: relative;
+  transition: color var(--motion-base) ease;
+}
+.sd-mobile-nav-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 22px;
+  height: 3px;
+  margin-left: -11px;
+  border-radius: 0 0 999px 999px;
+  background-color: var(--brand-text);
+  transform: scaleX(0);
+  transition: transform var(--motion-base) var(--ease-out);
+}
+.sd-mobile-nav-item.is-active::before {
+  transform: scaleX(1);
+}
+.sd-mobile-nav-item svg {
+  transition: transform var(--motion-base) var(--ease-spring);
+}
+.sd-mobile-nav-item.is-active svg {
+  transform: translateY(-1px) scale(1.08);
+}
+.sd-mobile-nav-item:active svg {
+  transform: scale(0.9);
+}
+
+/* Pill CTAs (Tailwind brand buttons) get press feedback */
+:root #__next-root :is(a, button).bg-blue-600:active,
+:root #__next-root :is(a, button).bg-blue-500:active {
+  transform: scale(0.97);
+}
+
+/* Respect the OS "reduce motion" setting everywhere */
 @media (prefers-reduced-motion: reduce) {
   :root #__next-root :is(a, button) {
     transition: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
