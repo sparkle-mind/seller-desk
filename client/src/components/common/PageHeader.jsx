@@ -19,7 +19,7 @@ export default function PageHeader({
           style={{ color: "var(--text-tertiary)" }}
         >
           <Link
-            href="/"
+            href="/dashboard"
             className="hover:text-brand-500 transition"
             style={{ color: "var(--text-tertiary)" }}
           >

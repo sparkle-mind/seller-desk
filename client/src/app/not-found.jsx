@@ -10,8 +10,8 @@ export default function NotFound() {
       description="We couldn’t find the page you were looking for. It may have moved, or the address may be incorrect."
       icon={SearchOffIcon}
       actionLabel="Go to dashboard"
-      actionHref="/"
-      secondaryLabel="Go back"
+      actionHref="/dashboard"
+      secondaryLabel="Back to home"
       secondaryHref="/"
     />
   );

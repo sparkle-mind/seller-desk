@@ -18,7 +18,7 @@ export default function Error({ error, reset }) {
       actionLabel="Try again"
       onAction={reset}
       secondaryLabel="Back to dashboard"
-      secondaryHref="/"
+      secondaryHref="/dashboard"
     />
   );
 }

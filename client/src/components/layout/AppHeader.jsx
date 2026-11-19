@@ -43,7 +43,7 @@ export default function AppHeader({ onMenuToggle }) {
         >
           <MenuIcon />
         </button> */}
-        <Link href="/" className="lg:hidden flex items-center gap-2.5 min-w-0">
+        <Link href="/dashboard" className="lg:hidden flex items-center gap-2.5 min-w-0">
           <span
             className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
             style={{

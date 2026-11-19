@@ -14,7 +14,7 @@ export default function SystemState({
   actionHref,
   onAction,
   secondaryLabel = "Back to dashboard",
-  secondaryHref = "/",
+  secondaryHref = "/dashboard",
 }) {
   return (
     <div className="flex min-h-[65vh] items-center justify-center py-10 sm:py-16">

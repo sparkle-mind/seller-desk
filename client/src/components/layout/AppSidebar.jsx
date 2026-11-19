@@ -25,7 +25,7 @@ import { resetFinance } from "@/store/slices/financeSlice";
 import { resetSettings } from "@/store/slices/settingsSlice";
 
 export const navigationItems = [
-  { name: "Dashboard", href: "/", icon: DashboardIcon },
+  { name: "Dashboard", href: "/dashboard", icon: DashboardIcon },
   { name: "Products", href: "/products", icon: Inventory2Icon },
   { name: "Inventory", href: "/inventory", icon: WarehouseIcon },
   { name: "Orders", href: "/orders", icon: ShoppingCartIcon },
@@ -72,7 +72,7 @@ export default function AppSidebar({ onClose }) {
         style={{ borderBottom: "1px solid var(--sidebar-border)" }}
       >
         <Link
-          href="/"
+          href="/dashboard"
           className="flex items-center gap-3 group"
           onClick={onClose}
         >
