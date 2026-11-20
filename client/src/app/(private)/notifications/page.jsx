@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import dayjs from "dayjs";
 import PageHeader from "@/components/common/PageHeader";
 import StatCard from "@/components/common/StatCard";
@@ -27,8 +28,6 @@ import {
 import Button from "@/components/common/Button";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import NotificationsActiveOutlinedIcon from "@mui/icons-material/NotificationsActiveOutlined";
 import PriorityHighIcon from "@mui/icons-material/PriorityHigh";
@@ -41,13 +40,13 @@ const VIEWS = ["all", "unread", "action"];
 
 export default function NotificationsPage() {
   const dispatch = useDispatch();
+  const toast = useToast();
   const notifications = useSelector((state) => state.notifications.items);
 
   const [view, setView] = useState(0);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [clearDialogOpen, setClearDialogOpen] = useState(false);
-  const [toast, setToast] = useState("");
 
   const counts = useMemo(() => {
     const unread = notifications.filter((n) => !n.read);
@@ -86,12 +85,12 @@ export default function NotificationsPage() {
 
   const handleMarkAllRead = () => {
     dispatch(markAllNotificationsRead());
-    setToast("All notifications marked as read");
+    toast.success("All notifications marked as read");
   };
 
   const handleDelete = (id) => {
     dispatch(deleteNotification(id));
-    setToast("Notification deleted");
+    toast.success("Notification deleted");
   };
 
   const emptyCopy = (() => {
@@ -268,21 +267,11 @@ export default function NotificationsPage() {
         confirmColor="warning"
         onConfirm={() => {
           dispatch(clearReadNotifications());
-          setToast("Read notifications cleared");
+          toast.success("Read notifications cleared");
         }}
         onClose={() => setClearDialogOpen(false)}
       />
 
-      <Snackbar
-        open={Boolean(toast)}
-        autoHideDuration={2500}
-        onClose={() => setToast("")}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert severity="success" variant="filled" onClose={() => setToast("")} sx={{ width: "100%" }}>
-          {toast}
-        </Alert>
-      </Snackbar>
     </div>
   );
 }

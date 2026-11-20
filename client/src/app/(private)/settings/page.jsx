@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import PageHeader from "@/components/common/PageHeader";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import { updateSettings, resetSettings } from "@/store/slices/settingsSlice";
@@ -15,8 +16,6 @@ import { resetNotifications } from "@/store/slices/notificationsSlice";
 
 // MUI
 import Button from "@/components/common/Button";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
 import SaveIcon from "@mui/icons-material/Save";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import StoreIcon from "@mui/icons-material/Store";
@@ -25,10 +24,10 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 
 export default function SettingsPage() {
   const dispatch = useDispatch();
+  const toast = useToast();
   const settings = useSelector((state) => state.settings.data);
 
   const [formData, setFormData] = useState(settings);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
   const handleChange = (field, value) => {
@@ -38,7 +37,7 @@ export default function SettingsPage() {
   const handleSave = (e) => {
     e.preventDefault();
     dispatch(updateSettings(formData));
-    setSnackbarOpen(true);
+    toast.success("Settings saved");
   };
 
   const handleResetAllData = () => {
@@ -334,22 +333,6 @@ export default function SettingsPage() {
         onClose={() => setResetDialogOpen(false)}
       />
 
-      {/* Snackbar feedback */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
-          onClose={() => setSnackbarOpen(false)}
-          severity="success"
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
-          Settings preferences saved successfully!
-        </Alert>
-      </Snackbar>
     </div>
   );
 }

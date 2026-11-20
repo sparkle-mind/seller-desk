@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import ProductImage from "@/components/common/ProductImage";
 import { useSelector, useDispatch } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import PageHeader from "@/components/common/PageHeader";
 import StatusChip from "@/components/common/StatusChip";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
@@ -38,6 +39,7 @@ export default function OrderDetailPage() {
   const params = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
+  const toast = useToast();
   const orders = useSelector((state) => state.orders.items);
   const products = useSelector((state) => state.products.items);
 
@@ -70,10 +72,12 @@ export default function OrderDetailPage() {
 
   const handleMarkDelivered = () => {
     dispatch(updateOrderStatus({ orderId: order.id, orderStatus: "Delivered", shipmentStatus: "Delivered", paymentStatus: "Paid" }));
+    toast.success("Order marked as delivered");
   };
 
   const handleDelete = () => {
     dispatch(deleteOrder(order.id));
+    toast.success(`Order ${order.id} deleted`);
     router.push("/orders");
   };
 
@@ -144,7 +148,7 @@ export default function OrderDetailPage() {
             </Button>
 
             {order.orderStatus === "Pending" && (
-              <Button onClick={() => dispatch(markPacked(order.id))}>
+              <Button onClick={() => { dispatch(markPacked(order.id)); toast.success("Order marked as packed"); }}>
                 Mark as Packed
               </Button>
             )}
@@ -388,7 +392,7 @@ export default function OrderDetailPage() {
         open={shipDialogOpen}
         order={order}
         onClose={() => setShipDialogOpen(false)}
-        onConfirm={(payload) => dispatch(markShipped(payload))}
+        onConfirm={(payload) => { dispatch(markShipped(payload)); toast.success("Order marked as shipped"); }}
       />
 
       {/* Edit Order Dialog */}
@@ -396,7 +400,7 @@ export default function OrderDetailPage() {
         open={editOpen}
         initialData={order}
         onClose={() => setEditOpen(false)}
-        onSubmit={(data) => dispatch(editOrder(data))}
+        onSubmit={(data) => { dispatch(editOrder(data)); toast.success("Order updated"); }}
       />
 
       {/* Mark Returned Dialog */}
@@ -404,7 +408,7 @@ export default function OrderDetailPage() {
         open={returnOpen}
         order={order}
         onClose={() => setReturnOpen(false)}
-        onConfirm={(payload) => dispatch(markReturned(payload))}
+        onConfirm={(payload) => { dispatch(markReturned(payload)); toast.success("Order marked as returned"); }}
       />
 
       {/* Cancel Dialog */}
@@ -414,7 +418,7 @@ export default function OrderDetailPage() {
         message="Are you sure you want to cancel this order? Payment status will be updated to Refunded."
         confirmLabel="Cancel Order"
         confirmColor="error"
-        onConfirm={() => dispatch(cancelOrder({ orderId: order.id, reason: "Cancelled by seller" }))}
+        onConfirm={() => { dispatch(cancelOrder({ orderId: order.id, reason: "Cancelled by seller" })); toast.success("Order cancelled"); }}
         onClose={() => setCancelDialogOpen(false)}
       />
 

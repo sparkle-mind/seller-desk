@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import PageHeader from "@/components/common/PageHeader";
 import StatCard from "@/components/common/StatCard";
 import FilterBar from "@/components/common/FilterBar";
@@ -44,6 +45,7 @@ import AddIcon from "@mui/icons-material/Add";
 
 export default function ShippingReturnsPage() {
   const dispatch = useDispatch();
+  const toast = useToast();
   const router = useRouter();
   const { shipments, returns, rtos } = useSelector((state) => state.shippingReturns);
   // Merge returned orders from the orders slice into the Customer Returns tab
@@ -190,6 +192,7 @@ export default function ShippingReturnsPage() {
 
   const handleEditShipmentSubmit = (payload) => {
     dispatch(editShipment(payload));
+    toast.success("Shipment updated");
   };
 
   const handleQuickMarkDelivered = (shipmentId) => {
@@ -199,6 +202,7 @@ export default function ShippingReturnsPage() {
         deliveryStatus: "Delivered",
       })
     );
+    toast.success(`Shipment ${shipmentId} marked as delivered`);
   };
 
   // Handlers for Returns
@@ -210,13 +214,16 @@ export default function ShippingReturnsPage() {
   // Restocking an Eligible return is handled by the sync layer (store/syncListeners.js)
   const handleInspectionSubmit = (data) => {
     dispatch(updateReturnInspection(data));
+    toast.success("Return inspection saved");
   };
 
   const handleReturnFormSubmit = (data) => {
     if (editingReturn) {
       dispatch(editCustomerReturn(data));
+      toast.success("Return updated");
     } else {
       dispatch(addCustomerReturn(data));
+      toast.success("Customer return recorded");
     }
   };
 
@@ -224,8 +231,10 @@ export default function ShippingReturnsPage() {
   const handleRtoFormSubmit = (data) => {
     if (editingRto) {
       dispatch(editRtoRecord(data));
+      toast.success("RTO record updated");
     } else {
       dispatch(addRtoRecord(data));
+      toast.success("RTO record added");
     }
   };
 
@@ -239,6 +248,7 @@ export default function ShippingReturnsPage() {
         notes: "Verified intact and restocked to inventory.",
       })
     );
+    toast.success(`RTO ${rto.id} received and restocked`);
   };
 
   const handleExport = () => {

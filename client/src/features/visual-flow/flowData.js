@@ -96,6 +96,18 @@ export const MODULES = [
     detailRoutes: [],
   },
   {
+    id: "calculator",
+    name: "Pricing Calculator",
+    href: "/calculator",
+    tone: "blue",
+    summary: "Work out total product cost, profit, margin and a target selling price; save calculations as cards.",
+    reads: ["calculator", "products"],
+    writes: ["calculator"],
+    actions: ["saveCalculation", "updateCalculation", "deleteCalculation"],
+    dialogs: [],
+    detailRoutes: [],
+  },
+  {
     id: "reports",
     name: "Reports & Analytics",
     href: "/reports",
@@ -142,6 +154,7 @@ export const SLICES = [
   { id: "suppliersPurchases", name: "suppliersPurchases", storageKey: "seller_desk_suppliers, _purchases", seed: "data/suppliers.js, data/purchases.js", holds: "Suppliers, balances and purchase orders" },
   { id: "finance", name: "finance", storageKey: "seller_desk_expenses, _settlements", seed: "data/expenses.js, data/settlements.js", holds: "Expenses and marketplace settlements" },
   { id: "settings", name: "settings", storageKey: "seller_desk_settings", seed: "data/settings.js", holds: "Business profile and preferences" },
+  { id: "calculator", name: "calculator", storageKey: "seller_desk_calculations", seed: "(starts empty)", holds: "Saved pricing calculations" },
   { id: "notifications", name: "notifications", storageKey: "seller_desk_notifications", seed: "data/notifications.js", holds: "Alert feed and read state" },
 ];
 

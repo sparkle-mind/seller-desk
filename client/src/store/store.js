@@ -7,6 +7,7 @@ import suppliersPurchasesReducer from "./slices/suppliersPurchasesSlice";
 import financeReducer from "./slices/financeSlice";
 import settingsReducer from "./slices/settingsSlice";
 import notificationsReducer from "./slices/notificationsSlice";
+import calculatorReducer from "./slices/calculatorSlice";
 import { syncListener } from "./syncListeners";
 
 export const store = configureStore({
@@ -19,6 +20,7 @@ export const store = configureStore({
     finance: financeReducer,
     settings: settingsReducer,
     notifications: notificationsReducer,
+    calculator: calculatorReducer,
   },
   // Cross-feature rules (orders <-> stock <-> shipments <-> returns, alerts)
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().prepend(syncListener.middleware),

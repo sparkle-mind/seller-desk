@@ -4,6 +4,7 @@ import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import ProductImage from "@/components/common/ProductImage";
 import { useSelector, useDispatch } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import PageHeader from "@/components/common/PageHeader";
 import FilterBar from "@/components/common/FilterBar";
 import DataTable from "@/components/common/DataTable";
@@ -28,6 +29,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 export default function ProductsPage() {
   const dispatch = useDispatch();
+  const toast = useToast();
   const products = useSelector((state) => state.products.items);
 
   const [search, setSearch] = useState("");
@@ -99,14 +101,17 @@ export default function ProductsPage() {
   const handleConfirmDelete = () => {
     if (deletingProductId) {
       dispatch(deleteProduct(deletingProductId));
+      toast.success("Product deleted");
     }
   };
 
   const handleFormSubmit = (data) => {
     if (editingProduct) {
       dispatch(updateProduct({ id: editingProduct.id, ...data }));
+      toast.success(`"${data.name || editingProduct.name}" updated`);
     } else {
       dispatch(addProduct(data));
+      toast.success(`"${data.name}" added to products`);
     }
   };
 

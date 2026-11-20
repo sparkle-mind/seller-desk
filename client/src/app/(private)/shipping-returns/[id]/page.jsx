@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import PageHeader from "@/components/common/PageHeader";
 import StatusChip from "@/components/common/StatusChip";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
@@ -83,15 +84,18 @@ function Timeline({ steps }) {
 ═══════════════════════════════════════════════════════════════════ */
 function ShipmentDetail({ shipment }) {
   const dispatch = useDispatch();
+  const toast = useToast();
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
 
   const handleMarkDelivered = () => {
     dispatch(updateShipmentStatus({ id: shipment.id, deliveryStatus: "Delivered" }));
+    toast.success("Shipment marked as delivered");
   };
 
   const handleEditSubmit = (payload) => {
     dispatch(editShipment(payload));
+    toast.success("Shipment updated");
   };
 
   const deliveryDone = shipment.deliveryStatus === "Delivered";
@@ -239,17 +243,20 @@ function ShipmentDetail({ shipment }) {
 ═══════════════════════════════════════════════════════════════════ */
 function ReturnDetail({ returnRecord }) {
   const dispatch = useDispatch();
+  const toast = useToast();
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
   const [inspectionOpen, setInspectionOpen] = useState(false);
 
   const handleEditSubmit = (data) => {
     dispatch(editCustomerReturn(data));
+    toast.success("Return updated");
   };
 
   // Restocking an Eligible return is handled by the sync layer (store/syncListeners.js)
   const handleInspectionSubmit = (data) => {
     dispatch(updateReturnInspection(data));
+    toast.success("Return inspection saved");
   };
 
   const timelineSteps = [
@@ -414,11 +421,13 @@ function ReturnDetail({ returnRecord }) {
 ═══════════════════════════════════════════════════════════════════ */
 function RtoDetail({ rto }) {
   const dispatch = useDispatch();
+  const toast = useToast();
   const router = useRouter();
   const [editOpen, setEditOpen] = useState(false);
 
   const handleEditSubmit = (data) => {
     dispatch(editRtoRecord(data));
+    toast.success("RTO record updated");
   };
 
   const handleMarkReceived = () => {
@@ -430,6 +439,7 @@ function RtoDetail({ rto }) {
         notes: rto.notes || "Verified intact and restocked to inventory.",
       })
     );
+    toast.success("RTO received and restocked");
   };
 
   const isReceived = rto.rtoStatus === "Received Back & Verified";

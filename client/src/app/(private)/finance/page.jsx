@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import PageHeader from "@/components/common/PageHeader";
 import StatCard from "@/components/common/StatCard";
 import FilterBar from "@/components/common/FilterBar";
@@ -69,6 +70,7 @@ const EXP_COLORS = [
 
 export default function FinancePage() {
   const dispatch = useDispatch();
+  const toast = useToast();
   const { expenses, settlements } = useSelector((state) => state.finance);
   const products = useSelector((state) => state.products.items);
   const orders = useSelector((state) => state.orders.items);
@@ -173,14 +175,17 @@ export default function FinancePage() {
   const handleExpenseSubmit = (data) => {
     if (editingExpense) {
       dispatch(updateExpense({ id: editingExpense.id, ...data }));
+      toast.success("Expense updated");
     } else {
       dispatch(addExpense(data));
+      toast.success("Expense recorded");
     }
   };
 
   const handleConfirmDelete = () => {
     if (deletingExpId) {
       dispatch(deleteExpense(deletingExpId));
+      toast.success("Expense deleted");
     }
   };
 
@@ -194,6 +199,7 @@ export default function FinancePage() {
         utrNumber: utrInput || `UTR${Date.now().toString().slice(-8)}`,
       }),
     );
+    toast.success(`Settlement ${selectedSettlement.id} marked as settled`);
     setSettlementDialogOpen(false);
   };
 

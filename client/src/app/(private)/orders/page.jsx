@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import PageHeader from "@/components/common/PageHeader";
 import StatCard from "@/components/common/StatCard";
 import FilterBar from "@/components/common/FilterBar";
@@ -47,6 +48,7 @@ import Link from "next/link";
 
 export default function OrdersPage() {
   const dispatch = useDispatch();
+  const toast = useToast();
   const router = useRouter();
   const orders = useSelector((state) => state.orders.items);
 
@@ -126,11 +128,19 @@ export default function OrdersPage() {
   );
 
   // ── Handlers ─────────────────────────────────────────────────────────────
-  const handleCreateOrder = (data) => dispatch(createOrder(data));
-  const handleEditOrder = (data) => dispatch(editOrder(data));
+  const handleCreateOrder = (data) => {
+    dispatch(createOrder(data));
+    toast.success("Order created");
+  };
+  const handleEditOrder = (data) => {
+    dispatch(editOrder(data));
+    toast.success(data.id ? `Order ${data.id} updated` : "Order updated");
+  };
   const handleConfirmDelete = () => {
-    if (selectedOrderForDelete)
+    if (selectedOrderForDelete) {
       dispatch(deleteOrder(selectedOrderForDelete.id));
+      toast.success(`Order ${selectedOrderForDelete.id} deleted`);
+    }
   };
   const handleConfirmCancel = () => {
     if (selectedOrderForCancel)
@@ -140,9 +150,16 @@ export default function OrdersPage() {
           reason: "Cancelled by seller",
         }),
       );
+    if (selectedOrderForCancel) toast.success(`Order ${selectedOrderForCancel.id} cancelled`);
   };
-  const handleConfirmReturn = (payload) => dispatch(markReturned(payload));
-  const handleConfirmShip = (payload) => dispatch(markShipped(payload));
+  const handleConfirmReturn = (payload) => {
+    dispatch(markReturned(payload));
+    toast.success("Order marked as returned");
+  };
+  const handleConfirmShip = (payload) => {
+    dispatch(markShipped(payload));
+    toast.success("Order marked as shipped");
+  };
 
   const handleExport = () => {
     const data = filteredOrders.map((o) => ({
@@ -303,6 +320,7 @@ export default function OrdersPage() {
               onClick={(e) => {
                 e.stopPropagation();
                 dispatch(markPacked(row.id));
+                toast.success(`Order ${row.id} packed`);
               }}
             >
               Pack

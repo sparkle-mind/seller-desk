@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import PageHeader from "@/components/common/PageHeader";
 import StatCard from "@/components/common/StatCard";
 import FilterBar from "@/components/common/FilterBar";
@@ -46,6 +47,7 @@ import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
 
 export default function SuppliersPurchasesPage() {
   const dispatch = useDispatch();
+  const toast = useToast();
   const router = useRouter();
   const { suppliers, purchases } = useSelector((state) => state.suppliersPurchases);
   const products = useSelector((state) => state.products.items);
@@ -128,20 +130,24 @@ export default function SuppliersPurchasesPage() {
   const handleSupplierSubmit = (data) => {
     if (editingSupplier) {
       dispatch(updateSupplier({ id: editingSupplier.id, ...data }));
+      toast.success(`Supplier "${data.name || editingSupplier.name}" updated`);
     } else {
       dispatch(addSupplier(data));
+      toast.success(`Supplier "${data.name}" added`);
     }
   };
 
   const handleConfirmDeleteSupplier = () => {
     if (deletingSupId) {
       dispatch(deleteSupplier(deletingSupId));
+      toast.success("Supplier deleted");
     }
   };
 
   // Handlers for PO
   const handleCreatePoSubmit = (payload) => {
     dispatch(addPurchaseOrder(payload));
+    toast.success("Purchase order created");
   };
 
   const handleConfirmReceivePo = () => {
@@ -183,6 +189,7 @@ export default function SuppliersPurchasesPage() {
       }
     });
 
+    toast.success(`${selectedPoForReceive.poNumber} received. Stock updated.`);
     setReceiveDialogOpen(false);
   };
 
@@ -196,6 +203,7 @@ export default function SuppliersPurchasesPage() {
         amount: Number(payAmount),
       })
     );
+    toast.success(`Payment of ₹${Number(payAmount).toLocaleString("en-IN")} recorded`);
     setPayDialogOpen(false);
   };
 

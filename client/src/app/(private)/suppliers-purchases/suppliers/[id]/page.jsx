@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import PageHeader from "@/components/common/PageHeader";
 import StatusChip from "@/components/common/StatusChip";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
@@ -68,6 +69,7 @@ export default function SupplierDetailPage() {
   const params = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
+  const toast = useToast();
 
   const { suppliers, purchases } = useSelector((state) => state.suppliersPurchases);
   const products = useSelector((state) => state.products.items);
@@ -113,19 +115,23 @@ export default function SupplierDetailPage() {
   // Handlers
   const handleEditSubmit = (data) => {
     dispatch(updateSupplier({ id: supplier.id, ...data }));
+    toast.success("Supplier updated");
   };
 
   const handleDelete = () => {
     dispatch(deleteSupplier(supplier.id));
+    toast.success(`Supplier "${supplier.name}" deleted`);
     router.push("/suppliers-purchases");
   };
 
   const handleCreatePo = (payload) => {
     dispatch(addPurchaseOrder({ ...payload, supplierId: supplier.id, supplierName: supplier.name }));
+    toast.success("Purchase order created");
   };
 
   const handleEditPoSubmit = (payload) => {
     dispatch(updatePurchaseOrder(payload));
+    toast.success("Purchase order updated");
   };
 
   const handleConfirmReceivePo = () => {
@@ -152,6 +158,7 @@ export default function SupplierDetailPage() {
         );
       }
     });
+    toast.success(`${selectedPoForReceive.poNumber} received. Stock updated.`);
     setReceiveDialogOpen(false);
   };
 
@@ -159,12 +166,14 @@ export default function SupplierDetailPage() {
     e.preventDefault();
     if (!selectedPoForPay || !payAmount || Number(payAmount) <= 0) return;
     dispatch(recordPayment({ poId: selectedPoForPay.id, amount: Number(payAmount) }));
+    toast.success(`Payment of ₹${Number(payAmount).toLocaleString("en-IN")} recorded`);
     setPayDialogOpen(false);
   };
 
   const handleCancelPo = () => {
     if (!cancellingPo) return;
     dispatch(cancelPurchaseOrder({ poId: cancellingPo.id, reason: "Cancelled by seller" }));
+    toast.success(`${cancellingPo.poNumber || cancellingPo.id} cancelled`);
     setCancelPoOpen(false);
   };
 

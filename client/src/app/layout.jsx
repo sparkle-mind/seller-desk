@@ -3,6 +3,7 @@ import { Alegreya, Instrument_Sans } from "next/font/google";
 import ThemeRegistry from "@/theme/ThemeRegistry";
 import ReduxProvider from "@/store/ReduxProvider";
 import AppLayout from "@/components/layout/AppLayout";
+import ToastProvider from "@/components/common/ToastProvider";
 
 export const metadata = {
   title: "SellerDesk | E-commerce Business Management Dashboard",
@@ -38,7 +39,9 @@ export default function RootLayout({ children }) {
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
         <ReduxProvider>
           <ThemeRegistry>
-            <AppLayout>{children}</AppLayout>
+            <ToastProvider>
+              <AppLayout>{children}</AppLayout>
+            </ToastProvider>
           </ThemeRegistry>
         </ReduxProvider>
       </body>

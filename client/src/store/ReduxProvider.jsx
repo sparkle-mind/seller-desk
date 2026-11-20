@@ -11,6 +11,7 @@ import { initializeSuppliersPurchases } from "./slices/suppliersPurchasesSlice";
 import { initializeFinance } from "./slices/financeSlice";
 import { initializeSettings } from "./slices/settingsSlice";
 import { initializeNotifications } from "./slices/notificationsSlice";
+import { initializeCalculator } from "./slices/calculatorSlice";
 
 function StoreInitializer({ children }) {
   const dispatch = useDispatch();
@@ -25,6 +26,7 @@ function StoreInitializer({ children }) {
     dispatch(initializeFinance());
     dispatch(initializeSettings());
     dispatch(initializeNotifications());
+    dispatch(initializeCalculator());
   }, [dispatch]);
 
   return <>{children}</>;

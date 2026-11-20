@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import ProductImage from "@/components/common/ProductImage";
 import { useSelector, useDispatch } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import PageHeader from "@/components/common/PageHeader";
 import StatCard from "@/components/common/StatCard";
 import StatusChip from "@/components/common/StatusChip";
@@ -41,6 +42,7 @@ export default function InventoryDetailPage() {
   const params = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
+  const toast = useToast();
 
   const products = useSelector((state) => state.products.items);
   const movements = useSelector((state) => state.inventory.movements);
@@ -101,6 +103,7 @@ export default function InventoryDetailPage() {
         referenceId: `ADJ-${Date.now().toString().slice(-4)}`,
       })
     );
+    toast.success(`Stock adjusted to ${adj.newStock} units`);
   };
 
   // Quick stock replenishment shortcut
@@ -120,6 +123,7 @@ export default function InventoryDetailPage() {
         referenceId: `QUICK-${Date.now().toString().slice(-4)}`,
       })
     );
+    toast.success(`Added ${qty} units. Stock is now ${newStock}`);
   };
 
   // Reorder Level save
@@ -128,6 +132,7 @@ export default function InventoryDetailPage() {
     const val = Number(newReorderValue);
     if (!isNaN(val) && val >= 1) {
       dispatch(updateReorderLevel({ productId: product.id, reorderLevel: val }));
+      toast.success(`Reorder level set to ${val}`);
       setReorderDialogOpen(false);
     }
   };
@@ -158,6 +163,7 @@ export default function InventoryDetailPage() {
           referenceId: `VAR-${editingVariant.id}`,
         })
       );
+      toast.success(`Variant ${editingVariant.size}/${editingVariant.color} stock set to ${qty}`);
       setEditingVariant(null);
     }
   };

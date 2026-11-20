@@ -11,6 +11,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import BusinessIcon from "@mui/icons-material/Business";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import CalculateIcon from "@mui/icons-material/Calculate";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import SettingsIcon from "@mui/icons-material/Settings";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
@@ -30,6 +31,7 @@ import { resetSuppliersPurchases } from "@/store/slices/suppliersPurchasesSlice"
 import { resetFinance } from "@/store/slices/financeSlice";
 import { resetNotifications } from "@/store/slices/notificationsSlice";
 import { resetSettings } from "@/store/slices/settingsSlice";
+import { resetCalculator } from "@/store/slices/calculatorSlice";
 
 export const navigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: DashboardIcon },
@@ -51,6 +53,7 @@ export const navigationItems = [
     href: "/finance",
     icon: AccountBalanceWalletIcon,
   },
+  { name: "Pricing Calculator", href: "/calculator", icon: CalculateIcon },
   { name: "Reports & Analytics", href: "/reports", icon: BarChartIcon },
   { name: "How It Works", href: "/visual-flow", icon: AccountTreeIcon },
   { name: "Notifications", href: "/notifications", icon: NotificationsNoneIcon },
@@ -73,6 +76,7 @@ export default function AppSidebar({ onClose }) {
     dispatch(resetFinance());
     dispatch(resetSettings());
     dispatch(resetNotifications());
+    dispatch(resetCalculator());
     if (typeof window !== "undefined") window.location.reload();
   };
 
@@ -289,7 +293,7 @@ export default function AppSidebar({ onClose }) {
       <ConfirmDialog
         open={resetDialogOpen}
         title="Reset All Mock Data?"
-        message="This will reset all products, inventory, orders, shipments, returns, expenses, and settings back to default demo records."
+        message="This will reset all products, inventory, orders, shipments, returns, expenses, saved calculations, and settings back to default demo records."
         confirmLabel="Reset Data"
         confirmColor="warning"
         onConfirm={handleResetAllData}

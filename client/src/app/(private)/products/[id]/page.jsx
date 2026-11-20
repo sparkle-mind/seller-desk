@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import Tooltip from "@mui/material/Tooltip";
 import ProductImage from "@/components/common/ProductImage";
 import PageHeader from "@/components/common/PageHeader";
@@ -137,6 +138,7 @@ export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
+  const toast = useToast();
   const products = useSelector((state) => state.products.items);
   const orders = useSelector((state) => state.orders.items);
 
@@ -190,6 +192,7 @@ export default function ProductDetailPage() {
 
   const handleUpdate = (data) => {
     dispatch(updateProduct({ id: product.id, ...data }));
+    toast.success("Product updated");
   };
 
   const copySku = async () => {

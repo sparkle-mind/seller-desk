@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import PageHeader from "@/components/common/PageHeader";
 import StatusChip from "@/components/common/StatusChip";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
@@ -81,6 +82,7 @@ export default function PurchaseOrderDetailPage() {
   const params = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
+  const toast = useToast();
 
   const { purchases, suppliers } = useSelector((state) => state.suppliersPurchases);
   const products = useSelector((state) => state.products.items);
@@ -140,11 +142,13 @@ export default function PurchaseOrderDetailPage() {
         );
       }
     });
+    toast.success(`${po.poNumber} received. Stock updated.`);
     setReceiveOpen(false);
   };
 
   const handleCancelPo = () => {
     dispatch(cancelPurchaseOrder({ poId: po.id, reason: "Cancelled by seller" }));
+    toast.success(`${po.poNumber} cancelled`);
     setCancelOpen(false);
   };
 
@@ -152,11 +156,13 @@ export default function PurchaseOrderDetailPage() {
     e.preventDefault();
     if (!payAmount || Number(payAmount) <= 0) return;
     dispatch(recordPayment({ poId: po.id, amount: Number(payAmount) }));
+    toast.success(`Payment of ₹${Number(payAmount).toLocaleString("en-IN")} recorded`);
     setPayDialogOpen(false);
   };
 
   const handleEditSubmit = (payload) => {
     dispatch(updatePurchaseOrder(payload));
+    toast.success("Purchase order updated");
   };
 
   const totalQty = po.items.reduce((s, i) => s + i.quantity, 0);

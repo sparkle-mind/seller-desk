@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useToast } from "@/components/common/ToastProvider";
 import Link from "next/link";
 import PageHeader from "@/components/common/PageHeader";
 import StatCard from "@/components/common/StatCard";
@@ -32,6 +33,7 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 
 export default function InventoryPage() {
   const dispatch = useDispatch();
+  const toast = useToast();
   const products = useSelector((state) => state.products.items);
   const movements = useSelector((state) => state.inventory.movements);
 
@@ -101,6 +103,7 @@ export default function InventoryPage() {
         referenceId: `ADJ-${Date.now().toString().slice(-4)}`,
       })
     );
+    toast.success(`Stock updated for "${adj.productName}" (now ${adj.newStock})`);
   };
 
   const handleOpenAdjust = (prod) => {
