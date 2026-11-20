@@ -11,17 +11,24 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import BusinessIcon from "@mui/icons-material/Business";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import SettingsIcon from "@mui/icons-material/Settings";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import StorefrontIcon from "@mui/icons-material/Storefront";
+import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
+import LogoutIcon from "@mui/icons-material/Logout";
+import Tooltip from "@mui/material/Tooltip";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
-import { useDispatch } from "react-redux";
+import SignOutDialog from "@/components/common/SignOutDialog";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUnreadCount } from "@/store/slices/notificationsSlice";
 import { resetProducts } from "@/store/slices/productsSlice";
 import { resetInventory } from "@/store/slices/inventorySlice";
 import { resetOrders } from "@/store/slices/ordersSlice";
 import { resetShippingReturns } from "@/store/slices/shippingReturnsSlice";
 import { resetSuppliersPurchases } from "@/store/slices/suppliersPurchasesSlice";
 import { resetFinance } from "@/store/slices/financeSlice";
+import { resetNotifications } from "@/store/slices/notificationsSlice";
 import { resetSettings } from "@/store/slices/settingsSlice";
 
 export const navigationItems = [
@@ -45,13 +52,17 @@ export const navigationItems = [
     icon: AccountBalanceWalletIcon,
   },
   { name: "Reports & Analytics", href: "/reports", icon: BarChartIcon },
+  { name: "How It Works", href: "/visual-flow", icon: AccountTreeIcon },
+  { name: "Notifications", href: "/notifications", icon: NotificationsNoneIcon },
   { name: "Settings", href: "/settings", icon: SettingsIcon },
 ];
 
 export default function AppSidebar({ onClose }) {
   const pathname = usePathname();
   const dispatch = useDispatch();
+  const unreadCount = useSelector(selectUnreadCount);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
+  const [signOutOpen, setSignOutOpen] = useState(false);
 
   const handleResetAllData = () => {
     dispatch(resetProducts());
@@ -61,6 +72,7 @@ export default function AppSidebar({ onClose }) {
     dispatch(resetSuppliersPurchases());
     dispatch(resetFinance());
     dispatch(resetSettings());
+    dispatch(resetNotifications());
     if (typeof window !== "undefined") window.location.reload();
   };
 
@@ -174,9 +186,24 @@ export default function AppSidebar({ onClose }) {
             >
               <Icon sx={{ fontSize: 19 }} />
               <span className="truncate">{item.name}</span>
+              {item.href === "/notifications" && unreadCount > 0 && (
+                <span
+                  className="ml-auto min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0"
+                  style={{
+                    backgroundColor: "var(--sidebar-active-bg)",
+                    color: "var(--sidebar-active-text)",
+                    boxShadow: "inset 0 0 0 1px var(--sidebar-active-border)",
+                  }}
+                  aria-label={`${unreadCount} unread`}
+                >
+                  {unreadCount}
+                </span>
+              )}
               {isActive && (
                 <span
-                  className="sd-pop-in ml-auto w-1.5 h-1.5 rounded-full shrink-0"
+                  className={`sd-pop-in ${
+                    item.href === "/notifications" && unreadCount > 0 ? "ml-2" : "ml-auto"
+                  } w-1.5 h-1.5 rounded-full shrink-0`}
                   style={{
                     backgroundColor: "var(--sidebar-active-indicator)",
                     boxShadow: "0 0 0 3px var(--sidebar-active-bg)",
@@ -230,7 +257,7 @@ export default function AppSidebar({ onClose }) {
               }}
             />
           </div>
-          <div className="overflow-hidden">
+          <div className="overflow-hidden flex-1 min-w-0">
             <div
               className="text-xs font-semibold truncate"
               style={{ color: "var(--sidebar-title)" }}
@@ -244,8 +271,20 @@ export default function AppSidebar({ onClose }) {
               DesiCart Retail LLP
             </div>
           </div>
+          <Tooltip title="Sign out" arrow placement="top">
+            <button
+              type="button"
+              onClick={() => setSignOutOpen(true)}
+              className="sd-nav-link shrink-0 p-2 rounded-xl transition-all duration-150 hover:!text-rose-500"
+              aria-label="Sign out"
+            >
+              <LogoutIcon sx={{ fontSize: 18 }} />
+            </button>
+          </Tooltip>
         </div>
       </div>
+
+      <SignOutDialog open={signOutOpen} onClose={() => setSignOutOpen(false)} />
 
       <ConfirmDialog
         open={resetDialogOpen}

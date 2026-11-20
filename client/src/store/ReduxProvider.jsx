@@ -10,6 +10,7 @@ import { initializeShippingReturns } from "./slices/shippingReturnsSlice";
 import { initializeSuppliersPurchases } from "./slices/suppliersPurchasesSlice";
 import { initializeFinance } from "./slices/financeSlice";
 import { initializeSettings } from "./slices/settingsSlice";
+import { initializeNotifications } from "./slices/notificationsSlice";
 
 function StoreInitializer({ children }) {
   const dispatch = useDispatch();
@@ -23,6 +24,7 @@ function StoreInitializer({ children }) {
     dispatch(initializeSuppliersPurchases());
     dispatch(initializeFinance());
     dispatch(initializeSettings());
+    dispatch(initializeNotifications());
   }, [dispatch]);
 
   return <>{children}</>;

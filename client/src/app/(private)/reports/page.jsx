@@ -15,7 +15,7 @@ import { formatCurrency, formatNumber, formatDate } from "@/lib/formatters";
 import { exportToCsv } from "@/lib/exportCsv";
 
 // MUI
-import Button from "@mui/material/Button";
+import Button from "@/components/common/Button";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import PrintIcon from "@mui/icons-material/Print";
@@ -234,18 +234,15 @@ export default function ReportsPage() {
             </select>
 
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<PrintIcon />}
               onClick={handlePrint}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Print Report
             </Button>
 
             <Button
-              variant="contained"
-              size="small"
               startIcon={<FileDownloadIcon />}
               onClick={handleExport}
             >
@@ -547,8 +544,6 @@ export default function ReportsPage() {
             Report dataset synthesized from underlying mock database with consistent accounting logic.
           </p>
           <Button
-            variant="contained"
-            size="small"
             startIcon={<FileDownloadIcon />}
             onClick={handleExport}
           >

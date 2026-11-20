@@ -11,9 +11,10 @@ import { resetOrders } from "@/store/slices/ordersSlice";
 import { resetShippingReturns } from "@/store/slices/shippingReturnsSlice";
 import { resetSuppliersPurchases } from "@/store/slices/suppliersPurchasesSlice";
 import { resetFinance } from "@/store/slices/financeSlice";
+import { resetNotifications } from "@/store/slices/notificationsSlice";
 
 // MUI
-import Button from "@mui/material/Button";
+import Button from "@/components/common/Button";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import SaveIcon from "@mui/icons-material/Save";
@@ -48,6 +49,7 @@ export default function SettingsPage() {
     dispatch(resetSuppliersPurchases());
     dispatch(resetFinance());
     dispatch(resetSettings());
+    dispatch(resetNotifications());
     if (typeof window !== "undefined") {
       localStorage.clear();
       window.location.reload();
@@ -303,22 +305,18 @@ export default function SettingsPage() {
         {/* Action Buttons */}
         <div className="flex items-center justify-between pt-2">
           <Button
+            variant="outline"
+            tone="warning"
             type="button"
-            variant="outlined"
-            color="warning"
             startIcon={<RestartAltIcon />}
             onClick={() => setResetDialogOpen(true)}
-            size="small"
           >
             Reset All Demo Data
           </Button>
 
           <Button
             type="submit"
-            variant="contained"
-            color="primary"
             startIcon={<SaveIcon />}
-            size="small"
           >
             Save Preferences
           </Button>

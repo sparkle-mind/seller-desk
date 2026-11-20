@@ -24,13 +24,10 @@ import { addMovement } from "@/store/slices/inventorySlice";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 
 // MUI
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
+import Button from "@/components/common/Button";
+import IconButton from "@/components/common/IconButton";
+import Modal from "@/components/common/Modal";
 import TextField from "@mui/material/TextField";
-import Tooltip from "@mui/material/Tooltip";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -188,35 +185,30 @@ export default function SupplierDetailPage() {
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push("/suppliers-purchases")}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
             <Button
-              variant="outlined"
-              color="error"
-              size="small"
+              variant="outline"
+              tone="danger"
               startIcon={<DeleteOutlineIcon />}
               onClick={() => setDeleteOpen(true)}
             >
               Delete
             </Button>
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="info"
               startIcon={<PostAddIcon />}
               onClick={() => setCreatePoOpen(true)}
-              sx={{ borderColor: "var(--btn-info-border)", color: "var(--btn-info-text)" }}
             >
               New Purchase Order
             </Button>
             <Button
-              variant="contained"
-              size="small"
               startIcon={<EditIcon />}
               onClick={() => setEditOpen(true)}
             >
@@ -313,7 +305,7 @@ export default function SupplierDetailPage() {
               <div className="text-center py-6 text-slate-400 text-sm">
                 No purchase orders for this supplier yet.
                 <div className="mt-2">
-                  <Button variant="outlined" size="small" startIcon={<PostAddIcon />} onClick={() => setCreatePoOpen(true)}>
+                  <Button variant="outline" startIcon={<PostAddIcon />} onClick={() => setCreatePoOpen(true)}>
                     Create First PO
                   </Button>
                 </div>
@@ -367,67 +359,63 @@ export default function SupplierDetailPage() {
                           <div className="flex items-center justify-end gap-1">
                             {/* Edit PO */}
                             {po.status !== "Received" && po.status !== "Cancelled" && (
-                              <Tooltip title="Edit PO">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setEditingPo(po);
-                                    setEditPoOpen(true);
-                                  }}
-                                  className="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-slate-100 transition"
-                                >
-                                  <EditIcon sx={{ fontSize: 15 }} />
-                                </button>
-                              </Tooltip>
+                              <IconButton
+                                label="Edit PO"
+                                tone="primary"
+                                className="!p-1"
+                                onClick={() => {
+                                  setEditingPo(po);
+                                  setEditPoOpen(true);
+                                }}
+                              >
+                                <EditIcon sx={{ fontSize: 15 }} />
+                              </IconButton>
                             )}
 
                             {/* Receive PO */}
                             {po.status !== "Received" && po.status !== "Cancelled" && (
-                              <Tooltip title="Mark as Received">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedPoForReceive(po);
-                                    setReceiveDialogOpen(true);
-                                  }}
-                                  className="p-1 rounded text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 transition"
-                                >
-                                  <MoveToInboxIcon sx={{ fontSize: 15 }} />
-                                </button>
-                              </Tooltip>
+                              <IconButton
+                                label="Mark as Received"
+                                tone="success"
+                                className="!p-1"
+                                onClick={() => {
+                                  setSelectedPoForReceive(po);
+                                  setReceiveDialogOpen(true);
+                                }}
+                              >
+                                <MoveToInboxIcon sx={{ fontSize: 15 }} />
+                              </IconButton>
                             )}
 
                             {/* Pay */}
                             {po.paymentStatus !== "Paid" && po.status !== "Cancelled" && (
-                              <Tooltip title="Record Payment">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedPoForPay(po);
-                                    setPayAmount(po.totalAmount - (po.paidAmount || 0));
-                                    setPayDialogOpen(true);
-                                  }}
-                                  className="p-1 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition"
-                                >
-                                  <PaymentsIcon sx={{ fontSize: 15 }} />
-                                </button>
-                              </Tooltip>
+                              <IconButton
+                                label="Record Payment"
+                                tone="primary"
+                                className="!p-1"
+                                onClick={() => {
+                                  setSelectedPoForPay(po);
+                                  setPayAmount(po.totalAmount - (po.paidAmount || 0));
+                                  setPayDialogOpen(true);
+                                }}
+                              >
+                                <PaymentsIcon sx={{ fontSize: 15 }} />
+                              </IconButton>
                             )}
 
                             {/* Cancel */}
                             {po.status !== "Received" && po.status !== "Cancelled" && (
-                              <Tooltip title="Cancel PO">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setCancellingPo(po);
-                                    setCancelPoOpen(true);
-                                  }}
-                                  className="p-1 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
-                                >
-                                  <CancelIcon sx={{ fontSize: 15 }} />
-                                </button>
-                              </Tooltip>
+                              <IconButton
+                                label="Cancel PO"
+                                tone="danger"
+                                className="!p-1"
+                                onClick={() => {
+                                  setCancellingPo(po);
+                                  setCancelPoOpen(true);
+                                }}
+                              >
+                                <CancelIcon sx={{ fontSize: 15 }} />
+                              </IconButton>
                             )}
                           </div>
                         </td>
@@ -497,33 +485,33 @@ export default function SupplierDetailPage() {
       />
 
       {/* Pay Dialog */}
-      <Dialog open={payDialogOpen} onClose={() => setPayDialogOpen(false)} maxWidth="xs" fullWidth>
-        <form onSubmit={handlePaySubmit}>
-          <DialogTitle className="border-b border-slate-200 pb-3 text-sm font-bold text-slate-900">
-            Record Payment — {selectedPoForPay?.poNumber}
-          </DialogTitle>
-          <DialogContent className="pt-4 space-y-3">
-            <p className="text-xs text-slate-600">
-              Total: <strong>{formatCurrency(selectedPoForPay?.totalAmount)}</strong> | Paid so far:{" "}
-              <strong>{formatCurrency(selectedPoForPay?.paidAmount || 0)}</strong>
-            </p>
-            <TextField
-              label="Payment Amount (₹)"
-              type="number"
-              size="small"
-              fullWidth
-              inputProps={{ min: 1, max: (selectedPoForPay?.totalAmount || 0) - (selectedPoForPay?.paidAmount || 0) }}
-              value={payAmount}
-              onChange={(e) => setPayAmount(e.target.value)}
-              required
-            />
-          </DialogContent>
-          <DialogActions className="p-3 border-t border-slate-200">
-            <Button onClick={() => setPayDialogOpen(false)} variant="outlined" size="small">Cancel</Button>
-            <Button type="submit" variant="contained" size="small">Record Payment</Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+      <Modal
+        open={payDialogOpen}
+        onClose={() => setPayDialogOpen(false)}
+        size="xs"
+        title="Record Payment"
+        subtitle={selectedPoForPay?.poNumber}
+        icon={PaymentsIcon}
+        tone="emerald"
+        onSubmit={handlePaySubmit}
+        submitLabel="Record Payment"
+        contentClassName="space-y-3"
+      >
+        <p className="text-xs text-slate-600">
+          Total: <strong>{formatCurrency(selectedPoForPay?.totalAmount)}</strong> | Paid so far:{" "}
+          <strong>{formatCurrency(selectedPoForPay?.paidAmount || 0)}</strong>
+        </p>
+        <TextField
+          label="Payment Amount (₹)"
+          type="number"
+          size="small"
+          fullWidth
+          inputProps={{ min: 1, max: (selectedPoForPay?.totalAmount || 0) - (selectedPoForPay?.paidAmount || 0) }}
+          value={payAmount}
+          onChange={(e) => setPayAmount(e.target.value)}
+          required
+        />
+      </Modal>
     </div>
   );
 }

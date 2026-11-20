@@ -46,6 +46,7 @@ const shippingReturnsSlice = createSlice({
       const shp = state.shipments.find((s) => s.id === id);
       if (shp) {
         if (deliveryStatus) shp.deliveryStatus = deliveryStatus;
+        if (deliveryStatus === "Delivered" && !shp.deliveredDate) shp.deliveredDate = new Date().toISOString();
         if (courierName) shp.courierName = courierName;
         if (awbNumber) shp.awbNumber = awbNumber;
         if (shippingCost !== undefined) shp.shippingCost = Number(shippingCost);
@@ -119,6 +120,31 @@ const shippingReturnsSlice = createSlice({
         saveToStorage(RTOS_KEY, state.rtos);
       }
     },
+    // ── Internal: used by the sync layer (store/syncListeners.js) ────
+    // Creates the shipment for an order when it is shipped.
+    addShipment: (state, action) => {
+      const nums = state.shipments.map((s) => Number(String(s.id).replace(/\D/g, "")) || 0);
+      const next = (nums.length ? Math.max(...nums) : 0) + 1;
+      state.shipments.unshift({
+        id: `SHP-${String(next).padStart(3, "0")}`,
+        shipmentDate: new Date().toISOString(),
+        deliveredDate: null,
+        deliveryStatus: "In Transit",
+        shippingCost: 65,
+        ...action.payload,
+      });
+      saveToStorage(SHIPMENTS_KEY, state.shipments);
+    },
+    // Merges fields into a shipment, return or RTO without triggering sync.
+    syncShippingRecord: (state, action) => {
+      const { collection, id, changes } = action.payload;
+      const KEYS = { shipments: SHIPMENTS_KEY, returns: RETURNS_KEY, rtos: RTOS_KEY };
+      const record = state[collection]?.find((r) => r.id === id);
+      if (record && KEYS[collection]) {
+        Object.assign(record, changes);
+        saveToStorage(KEYS[collection], state[collection]);
+      }
+    },
     resetShippingReturns: (state) => {
       state.shipments = initialShipments;
       state.returns = initialReturns;
@@ -140,6 +166,8 @@ export const {
   addRtoRecord,
   editRtoRecord,
   updateRtoStatus,
+  addShipment,
+  syncShippingRecord,
   resetShippingReturns,
 } = shippingReturnsSlice.actions;
 

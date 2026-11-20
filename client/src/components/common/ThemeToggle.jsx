@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useAppTheme, PALETTES, BACKGROUNDS } from "@/theme/ThemeContext";
 import { paletteDisplay } from "@/theme/paletteUtils";
 import Popover from "@mui/material/Popover";
+import IconButton from "./IconButton";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
@@ -25,11 +26,10 @@ export default function ThemeToggle() {
 
   return (
     <>
-      <button
-        type="button"
+      <IconButton
+        label="Theme settings"
+        size="md"
         onClick={(e) => setAnchorEl(e.currentTarget)}
-        className="p-2 sd-icon-btn"
-        aria-label="Theme settings"
       >
         {/* Keyed so the icon spins in whenever the resolved mode flips */}
         <span key={resolvedMode} className="sd-spin-in">
@@ -39,7 +39,7 @@ export default function ThemeToggle() {
             <LightModeOutlinedIcon sx={{ fontSize: 21 }} />
           )}
         </span>
-      </button>
+      </IconButton>
 
       <Popover
         open={open}

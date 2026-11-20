@@ -20,9 +20,9 @@ export default function LegalPage({ eyebrow, title, description, updated, sectio
               <ol className="mt-4 space-y-2.5">
                 {sections.map((section) => (
                   <li key={section.id}>
-                    <a href={`#${section.id}`} className="sd-pub-footer-link">
+                    <Link href={`#${section.id}`} className="sd-pub-footer-link">
                       {section.heading}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ol>

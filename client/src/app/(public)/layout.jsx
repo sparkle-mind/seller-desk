@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import "@/components/public/public.css";
 import PublicHeader from "@/components/public/PublicHeader";
 import PublicFooter from "@/components/public/PublicFooter";
@@ -17,9 +18,9 @@ export const metadata = {
 export default function PublicLayout({ children }) {
   return (
     <div className="sd-pub">
-      <a href="#main-content" className="sd-pub-skip">
+      <Link href="#main-content" className="sd-pub-skip">
         Skip to content
-      </a>
+      </Link>
       <PublicHeader />
       <main id="main-content" className="flex-1">
         {children}

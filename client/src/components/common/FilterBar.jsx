@@ -6,7 +6,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
-import Button from "@mui/material/Button";
+import Button from "./Button";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 
@@ -47,19 +47,14 @@ export default function FilterBar({
         ))}
 
         {onReset && (
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            tone="neutral"
+            startIcon={<RestartAltIcon sx={{ fontSize: 16 }} />}
             onClick={onReset}
-            className="inline-flex items-center justify-center gap-1 px-3 py-2 text-xs font-medium rounded-lg transition hover:opacity-90"
-            style={{
-              backgroundColor: "var(--bg-surface2)",
-              color: "var(--text-secondary)",
-              border: "1px solid var(--border)",
-            }}
           >
-            <RestartAltIcon sx={{ fontSize: 16 }} />
-            <span>Reset</span>
-          </button>
+            Reset
+          </Button>
         )}
       </div>
 

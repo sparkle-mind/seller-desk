@@ -18,7 +18,7 @@ import { formatCurrency, formatNumber, formatDateTime } from "@/lib/formatters";
 import { exportToCsv } from "@/lib/exportCsv";
 
 // MUI
-import Button from "@mui/material/Button";
+import Button from "@/components/common/Button";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Tooltip from "@mui/material/Tooltip";
@@ -248,20 +248,21 @@ export default function InventoryPage() {
       align: "right",
       render: (_, row) => (
         <div className="flex items-center justify-end gap-1.5">
-          <Link
+          <Button
+            component={Link}
             href={`/inventory/${row.id}`}
-            className="inline-flex items-center gap-1 px-2 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs transition"
+            variant="soft"
+            tone="neutral"
           >
-            <span>Details</span>
-          </Link>
-          <button
-            type="button"
+            Details
+          </Button>
+          <Button
+            variant="soft"
+            startIcon={<EditNoteIcon sx={{ fontSize: 16 }} />}
             onClick={() => handleOpenAdjust(row)}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold text-xs transition"
           >
-            <EditNoteIcon sx={{ fontSize: 16 }} />
-            <span>Adjust</span>
-          </button>
+            Adjust
+          </Button>
         </div>
       ),
     },
@@ -352,11 +353,10 @@ export default function InventoryPage() {
         breadcrumbs={[{ label: "Inventory" }]}
         actions={
           <Button
-            variant="outlined"
-            size="small"
+            variant="outline"
+            tone="neutral"
             startIcon={<FileDownloadIcon />}
             onClick={currentTab === 0 ? handleExportStock : handleExportMovements}
-            sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
           >
             Export {currentTab === 0 ? "Inventory CSV" : "Movements CSV"}
           </Button>

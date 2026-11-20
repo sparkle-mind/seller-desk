@@ -19,12 +19,10 @@ import {
   editRtoRecord,
   updateRtoStatus,
 } from "@/store/slices/shippingReturnsSlice";
-import { adjustStock } from "@/store/slices/productsSlice";
-import { addMovement } from "@/store/slices/inventorySlice";
 import { formatCurrency, formatDate, formatDateTime } from "@/lib/formatters";
 
 // MUI
-import Button from "@mui/material/Button";
+import Button from "@/components/common/Button";
 import Tooltip from "@mui/material/Tooltip";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
@@ -142,19 +140,16 @@ function ShipmentDetail({ shipment }) {
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push("/shipping-returns")}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
             {!deliveryDone && !isCancelled && (
               <Button
-                variant="contained"
-                color="success"
-                size="small"
+                tone="success"
                 startIcon={<CheckCircleIcon />}
                 onClick={handleMarkDelivered}
               >
@@ -162,8 +157,6 @@ function ShipmentDetail({ shipment }) {
               </Button>
             )}
             <Button
-              variant="contained"
-              size="small"
               startIcon={<EditIcon />}
               onClick={() => setEditOpen(true)}
             >
@@ -247,7 +240,6 @@ function ShipmentDetail({ shipment }) {
 function ReturnDetail({ returnRecord }) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const products = useSelector((state) => state.products.items);
   const [editOpen, setEditOpen] = useState(false);
   const [inspectionOpen, setInspectionOpen] = useState(false);
 
@@ -255,29 +247,9 @@ function ReturnDetail({ returnRecord }) {
     dispatch(editCustomerReturn(data));
   };
 
+  // Restocking an Eligible return is handled by the sync layer (store/syncListeners.js)
   const handleInspectionSubmit = (data) => {
     dispatch(updateReturnInspection(data));
-    if (data.restockEligibility === "Eligible" && !returnRecord.restocked) {
-      const prod = products.find(
-        (p) => p.sku === returnRecord.sku || p.name === returnRecord.productName
-      );
-      if (prod) {
-        dispatch(adjustStock({ productId: prod.id, newStock: prod.stock + 1 }));
-        dispatch(
-          addMovement({
-            productId: prod.id,
-            productName: prod.name,
-            sku: prod.sku,
-            type: "Return Restock",
-            quantity: 1,
-            previousStock: prod.stock,
-            newStock: prod.stock + 1,
-            reason: `Return restocked after inspection (${returnRecord.id})`,
-            referenceId: returnRecord.id,
-          })
-        );
-      }
-    }
   };
 
   const timelineSteps = [
@@ -326,26 +298,22 @@ function ReturnDetail({ returnRecord }) {
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push("/shipping-returns")}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="info"
               startIcon={<RateReviewIcon />}
               onClick={() => setInspectionOpen(true)}
-              sx={{ borderColor: "var(--btn-info-border)", color: "var(--btn-info-text)" }}
             >
               Inspect Return
             </Button>
             <Button
-              variant="contained"
-              size="small"
               startIcon={<EditIcon />}
               onClick={() => setEditOpen(true)}
             >
@@ -447,7 +415,6 @@ function ReturnDetail({ returnRecord }) {
 function RtoDetail({ rto }) {
   const dispatch = useDispatch();
   const router = useRouter();
-  const products = useSelector((state) => state.products.items);
   const [editOpen, setEditOpen] = useState(false);
 
   const handleEditSubmit = (data) => {
@@ -507,19 +474,16 @@ function RtoDetail({ rto }) {
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push("/shipping-returns")}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
             {!isReceived && (
               <Button
-                variant="contained"
-                color="success"
-                size="small"
+                tone="success"
                 startIcon={<CheckCircleIcon />}
                 onClick={handleMarkReceived}
               >
@@ -527,8 +491,6 @@ function RtoDetail({ rto }) {
               </Button>
             )}
             <Button
-              variant="contained"
-              size="small"
               startIcon={<EditIcon />}
               onClick={() => setEditOpen(true)}
             >

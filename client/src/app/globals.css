@@ -939,9 +939,11 @@ html.dark #__next-root .bg-blue-700.text-white {
   border-color: var(--border) !important;
 }
 .dark .MuiDialogTitle-root,
-.dark .MuiDialogContent-root,
-.dark .MuiDialogActions-root {
+.dark .MuiDialogContent-root {
   background-color: var(--bg-surface);
+}
+.dark .MuiDialogActions-root {
+  background-color: var(--bg-surface2);
 }
 .dark .MuiTablePagination-root {
   color: var(--text-secondary) !important;
@@ -1195,6 +1197,10 @@ html.dark #__next-root .sd-feature-band .bg-slate-700:hover {
   from { opacity: 0; transform: scale(0.94); }
   to   { opacity: 1; transform: none; }
 }
+@keyframes sd-sheet-in {
+  from { transform: translate3d(0, 100%, 0); }
+  to   { transform: none; }
+}
 @keyframes sd-dialog-in {
   from { opacity: 0; transform: translate3d(0, 12px, 0) scale(0.97); }
   to   { opacity: 1; transform: none; }
@@ -1389,3 +1395,90 @@ html.dark #__next-root .sd-feature-band .bg-slate-700:hover {
   }
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════
+   MODAL SYSTEM — shared body/field styling for every MUI Dialog.
+   Layout (sheet on phones, card on desktop) lives in ThemeRegistry's
+   buildModalOverrides(); this layer handles what's inside.
+   Selectors are prefixed with #__next-root so they outrank Tailwind's
+   `important: "#__next-root"` utilities on the raw form controls.
+═══════════════════════════════════════════════════════════════════ */
+
+/* Forms wrap title/content/actions: keep the paper's flex column so the
+   header and footer stay pinned while only the body scrolls. */
+.MuiDialog-paper > form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.MuiDialogContent-root {
+  scrollbar-gutter: stable;
+}
+
+/* Native fields inside modals */
+#__next-root .MuiDialog-paper :is(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not(.MuiInputBase-input),
+  select:not(.MuiInputBase-input),
+  textarea:not(.MuiInputBase-input)
+) {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.4;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+#__next-root .MuiDialog-paper textarea:not(.MuiInputBase-input) {
+  min-height: 64px;
+  resize: vertical;
+}
+#__next-root .MuiDialog-paper :is(input, select, textarea):not(.MuiInputBase-input):hover:not(:disabled):not(:focus) {
+  border-color: var(--border-strong);
+}
+#__next-root .MuiDialog-paper :is(input, select, textarea):not(.MuiInputBase-input):focus {
+  outline: none;
+  border-color: rgb(var(--brand-500-rgb));
+  box-shadow: 0 0 0 3px var(--brand-ring);
+}
+#__next-root .MuiDialog-paper :is(input, select, textarea):not(.MuiInputBase-input)::placeholder {
+  color: var(--text-tertiary);
+}
+#__next-root .MuiDialog-paper :is(input, select, textarea):not(.MuiInputBase-input):disabled,
+#__next-root .MuiDialog-paper :is(input, textarea):read-only:not(.MuiInputBase-input):not([type="checkbox"]):not([type="radio"]) {
+  background-color: var(--bg-surface2);
+  color: var(--text-secondary);
+}
+#__next-root .MuiDialog-paper select:not(.MuiInputBase-input) {
+  cursor: pointer;
+  padding-right: 32px;
+}
+#__next-root .MuiDialog-paper input[type="checkbox"],
+#__next-root .MuiDialog-paper input[type="radio"] {
+  accent-color: rgb(var(--brand-500-rgb));
+  width: 16px;
+  height: 16px;
+}
+
+/* Field labels */
+#__next-root .MuiDialog-paper label.block {
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+}
+
+/* Phones: 16px text stops iOS from zooming into focused fields, and
+   taller controls make comfortable touch targets. */
+@media (max-width: 599.95px) {
+  #__next-root .MuiDialog-paper :is(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]):not(.MuiInputBase-input),
+    select:not(.MuiInputBase-input),
+    textarea:not(.MuiInputBase-input)
+  ) {
+    min-height: 44px;
+    font-size: 16px;
+  }
+}

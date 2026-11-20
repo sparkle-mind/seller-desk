@@ -19,11 +19,8 @@ import { addMovement } from "@/store/slices/inventorySlice";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 
 // MUI
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
+import Button from "@/components/common/Button";
+import Modal from "@/components/common/Modal";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -219,20 +216,18 @@ export default function PurchaseOrderDetailPage() {
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.back()}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
 
             {!isReceived && !isCancelled && (
               <Button
-                variant="outlined"
-                color="error"
-                size="small"
+                variant="outline"
+                tone="danger"
                 startIcon={<CancelIcon />}
                 onClick={() => setCancelOpen(true)}
               >
@@ -242,11 +237,10 @@ export default function PurchaseOrderDetailPage() {
 
             {!isReceived && !isCancelled && (
               <Button
-                variant="outlined"
-                size="small"
+                variant="outline"
+                tone="info"
                 startIcon={<EditIcon />}
                 onClick={() => setEditOpen(true)}
-                sx={{ borderColor: "var(--btn-info-border)", color: "var(--btn-info-text)" }}
               >
                 Edit PO
               </Button>
@@ -254,14 +248,13 @@ export default function PurchaseOrderDetailPage() {
 
             {!isPaid && !isCancelled && (
               <Button
-                variant="outlined"
-                size="small"
+                variant="outline"
+                tone="success"
                 startIcon={<PaymentsIcon />}
                 onClick={() => {
                   setPayAmount(balance);
                   setPayDialogOpen(true);
                 }}
-                sx={{ borderColor: "var(--btn-success-border)", color: "var(--btn-success-text)" }}
               >
                 Record Payment
               </Button>
@@ -269,9 +262,7 @@ export default function PurchaseOrderDetailPage() {
 
             {!isReceived && !isCancelled && (
               <Button
-                variant="contained"
-                color="success"
-                size="small"
+                tone="success"
                 startIcon={<MoveToInboxIcon />}
                 onClick={() => setReceiveOpen(true)}
               >
@@ -379,8 +370,6 @@ export default function PurchaseOrderDetailPage() {
               </div>
               {!isPaid && !isCancelled && (
                 <Button
-                  variant="contained"
-                  size="small"
                   startIcon={<PaymentsIcon />}
                   onClick={() => {
                     setPayAmount(balance);
@@ -479,34 +468,34 @@ export default function PurchaseOrderDetailPage() {
         onClose={() => setCancelOpen(false)}
       />
 
-      <Dialog open={payDialogOpen} onClose={() => setPayDialogOpen(false)} maxWidth="xs" fullWidth>
-        <form onSubmit={handlePaySubmit}>
-          <DialogTitle className="border-b border-slate-200 pb-3 text-sm font-bold text-slate-900">
-            Record Payment — {po.poNumber}
-          </DialogTitle>
-          <DialogContent className="pt-4 space-y-3">
-            <p className="text-xs text-slate-600">
-              Total: <strong>{formatCurrency(po.totalAmount)}</strong> | Paid:{" "}
-              <strong className="text-emerald-700">{formatCurrency(po.paidAmount || 0)}</strong> | Balance:{" "}
-              <strong className="text-amber-700">{formatCurrency(balance)}</strong>
-            </p>
-            <TextField
-              label="Payment Amount (₹)"
-              type="number"
-              size="small"
-              fullWidth
-              inputProps={{ min: 1, max: balance }}
-              value={payAmount}
-              onChange={(e) => setPayAmount(e.target.value)}
-              required
-            />
-          </DialogContent>
-          <DialogActions className="p-3 border-t border-slate-200">
-            <Button onClick={() => setPayDialogOpen(false)} variant="outlined" size="small">Cancel</Button>
-            <Button type="submit" variant="contained" size="small">Record Payment</Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+      <Modal
+        open={payDialogOpen}
+        onClose={() => setPayDialogOpen(false)}
+        size="xs"
+        title="Record Payment"
+        subtitle={po.poNumber}
+        icon={PaymentsIcon}
+        tone="emerald"
+        onSubmit={handlePaySubmit}
+        submitLabel="Record Payment"
+        contentClassName="space-y-3"
+      >
+        <p className="text-xs text-slate-600">
+          Total: <strong>{formatCurrency(po.totalAmount)}</strong> | Paid:{" "}
+          <strong className="text-emerald-700">{formatCurrency(po.paidAmount || 0)}</strong> | Balance:{" "}
+          <strong className="text-amber-700">{formatCurrency(balance)}</strong>
+        </p>
+        <TextField
+          label="Payment Amount (₹)"
+          type="number"
+          size="small"
+          fullWidth
+          inputProps={{ min: 1, max: balance }}
+          value={payAmount}
+          onChange={(e) => setPayAmount(e.target.value)}
+          required
+        />
+      </Modal>
     </div>
   );
 }

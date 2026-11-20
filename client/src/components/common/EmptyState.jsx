@@ -2,7 +2,7 @@
 
 import React from "react";
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
-import Button from "@mui/material/Button";
+import Button from "@/components/common/Button";
 
 export default function EmptyState({
   title = "No data found",
@@ -26,7 +26,7 @@ export default function EmptyState({
       <p className="text-sm mt-1 max-w-sm" style={{ color: "var(--text-secondary)" }}>{description}</p>
       {actionLabel && onAction && (
         <div className="mt-4">
-          <Button variant="contained" size="small" onClick={onAction}>
+          <Button onClick={onAction}>
             {actionLabel}
           </Button>
         </div>

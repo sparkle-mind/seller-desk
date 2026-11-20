@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
+import ProductImage from "@/components/common/ProductImage";
 import { useSelector, useDispatch } from "react-redux";
 import PageHeader from "@/components/common/PageHeader";
 import FilterBar from "@/components/common/FilterBar";
@@ -16,7 +17,8 @@ import { formatCurrency, formatNumber } from "@/lib/formatters";
 import { exportToCsv } from "@/lib/exportCsv";
 
 // MUI Icons & components
-import Button from "@mui/material/Button";
+import Button from "@/components/common/Button";
+import IconButton from "@/components/common/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import EditIcon from "@mui/icons-material/Edit";
@@ -137,9 +139,11 @@ export default function ProductsPage() {
       sortable: true,
       render: (_, row) => (
         <div className="flex items-center gap-3">
-          <img
-            src={row.image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100"}
+          <ProductImage
+            src={row.image}
             alt={row.name}
+            width={40}
+            height={40}
             className="w-10 h-10 rounded-lg object-cover bg-slate-100 border border-slate-200 shrink-0"
           />
           <div className="overflow-hidden">
@@ -264,25 +268,21 @@ export default function ProductsPage() {
             </Link>
           </Tooltip>
 
-          <Tooltip title="Edit Product">
-            <button
-              type="button"
-              onClick={(e) => handleOpenEdit(row, e)}
-              className="p-1.5 rounded text-slate-500 hover:text-blue-600 hover:bg-slate-100 transition"
-            >
-              <EditIcon sx={{ fontSize: 18 }} />
-            </button>
-          </Tooltip>
+          <IconButton
+            label="Edit Product"
+            tone="primary"
+            onClick={(e) => handleOpenEdit(row, e)}
+          >
+            <EditIcon sx={{ fontSize: 18 }} />
+          </IconButton>
 
-          <Tooltip title="Delete Product">
-            <button
-              type="button"
-              onClick={(e) => handleOpenDelete(row.id, e)}
-              className="p-1.5 rounded text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition"
-            >
-              <DeleteOutlineIcon sx={{ fontSize: 18 }} />
-            </button>
-          </Tooltip>
+          <IconButton
+            label="Delete Product"
+            tone="danger"
+            onClick={(e) => handleOpenDelete(row.id, e)}
+          >
+            <DeleteOutlineIcon sx={{ fontSize: 18 }} />
+          </IconButton>
         </div>
       ),
     },
@@ -297,17 +297,14 @@ export default function ProductsPage() {
         actions={
           <>
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<FileDownloadIcon />}
               onClick={handleExport}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Export CSV
             </Button>
             <Button
-              variant="contained"
-              size="small"
               startIcon={<AddIcon />}
               onClick={handleOpenAdd}
             >

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import ProductImage from "@/components/common/ProductImage";
 import { useSelector, useDispatch } from "react-redux";
 import PageHeader from "@/components/common/PageHeader";
 import StatusChip from "@/components/common/StatusChip";
@@ -22,7 +23,7 @@ import {
 import { formatCurrency, formatDateTime } from "@/lib/formatters";
 
 // MUI
-import Button from "@mui/material/Button";
+import Button from "@/components/common/Button";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import PersonIcon from "@mui/icons-material/Person";
@@ -115,46 +116,41 @@ export default function OrderDetailPage() {
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push("/orders")}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
 
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<PrintIcon />}
               onClick={handlePrint}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Print
             </Button>
 
             {/* Edit always available */}
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="info"
               startIcon={<EditIcon />}
               onClick={() => setEditOpen(true)}
-              sx={{ borderColor: "var(--btn-info-border)", color: "var(--btn-info-text)" }}
             >
               Edit
             </Button>
 
             {order.orderStatus === "Pending" && (
-              <Button variant="contained" size="small" onClick={() => dispatch(markPacked(order.id))}>
+              <Button onClick={() => dispatch(markPacked(order.id))}>
                 Mark as Packed
               </Button>
             )}
 
             {order.orderStatus === "Processing" && (
               <Button
-                variant="contained"
-                size="small"
                 startIcon={<LocalShippingIcon />}
                 onClick={() => setShipDialogOpen(true)}
               >
@@ -164,9 +160,7 @@ export default function OrderDetailPage() {
 
             {order.orderStatus === "Shipped" && (
               <Button
-                variant="contained"
-                color="success"
-                size="small"
+                tone="success"
                 startIcon={<CheckCircleIcon />}
                 onClick={handleMarkDelivered}
               >
@@ -176,11 +170,10 @@ export default function OrderDetailPage() {
 
             {(order.orderStatus === "Shipped" || order.orderStatus === "Delivered") && (
               <Button
-                variant="outlined"
-                size="small"
+                variant="outline"
+                tone="warning"
                 startIcon={<AssignmentReturnIcon />}
                 onClick={() => setReturnOpen(true)}
-                sx={{ borderColor: "var(--btn-warning-border)", color: "var(--btn-warning-text)" }}
               >
                 Mark Returned
               </Button>
@@ -188,9 +181,8 @@ export default function OrderDetailPage() {
 
             {(order.orderStatus === "Pending" || order.orderStatus === "Processing") && (
               <Button
-                variant="outlined"
-                color="error"
-                size="small"
+                variant="outline"
+                tone="danger"
                 onClick={() => setCancelDialogOpen(true)}
               >
                 Cancel Order
@@ -199,9 +191,8 @@ export default function OrderDetailPage() {
 
             {/* Delete — always available */}
             <Button
-              variant="outlined"
-              color="error"
-              size="small"
+              variant="outline"
+              tone="danger"
               startIcon={<DeleteOutlineIcon />}
               onClick={() => setDeleteOpen(true)}
             >
@@ -246,9 +237,11 @@ export default function OrderDetailPage() {
             </div>
 
             <div className="p-4 flex items-center gap-4">
-              <img
-                src={product?.image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100"}
+              <ProductImage
+                src={product?.image}
                 alt={order.productName}
+                width={64}
+                height={64}
                 className="w-16 h-16 rounded-lg object-cover bg-slate-100 border border-slate-200 shrink-0"
               />
               <div className="flex-1 min-w-0">

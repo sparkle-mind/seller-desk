@@ -28,7 +28,8 @@ import { formatCurrency, formatDateTime } from "@/lib/formatters";
 import { exportToCsv } from "@/lib/exportCsv";
 
 // MUI
-import Button from "@mui/material/Button";
+import Button from "@/components/common/Button";
+import IconButton from "@/components/common/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 import AddIcon from "@mui/icons-material/Add";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -283,97 +284,90 @@ export default function OrdersPage() {
           </Tooltip>
 
           {/* Edit */}
-          <Tooltip title="Edit Order">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setEditingOrder(row);
-                setOrderFormOpen(true);
-              }}
-              className="p-1.5 rounded text-slate-400 hover:text-blue-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
-            >
-              <EditIcon sx={{ fontSize: 16 }} />
-            </button>
-          </Tooltip>
+          <IconButton
+            label="Edit Order"
+            tone="primary"
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditingOrder(row);
+              setOrderFormOpen(true);
+            }}
+          >
+            <EditIcon sx={{ fontSize: 16 }} />
+          </IconButton>
 
           {/* Pack */}
           {row.orderStatus === "Pending" && (
-            <button
-              type="button"
+            <Button
+              variant="soft"
               onClick={(e) => {
                 e.stopPropagation();
                 dispatch(markPacked(row.id));
               }}
-              className="px-2 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold text-xs transition"
             >
               Pack
-            </button>
+            </Button>
           )}
 
           {/* Ship */}
           {row.orderStatus === "Processing" && (
-            <button
-              type="button"
+            <Button
+              variant="soft"
+              tone="info"
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedOrderForShip(row);
                 setShipDialogOpen(true);
               }}
-              className="px-2 py-1 rounded bg-indigo-50 text-indigo-700 hover:bg-indigo-100 font-semibold text-xs transition"
             >
               Ship
-            </button>
+            </Button>
           )}
 
           {/* Mark Return */}
           {(row.orderStatus === "Shipped" ||
             row.orderStatus === "Delivered") && (
-            <Tooltip title="Mark as Returned">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedOrderForReturn(row);
-                  setReturnDialogOpen(true);
-                }}
-                className="p-1.5 rounded text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition"
-              >
-                <AssignmentReturnIcon sx={{ fontSize: 16 }} />
-              </button>
-            </Tooltip>
+            <IconButton
+              label="Mark as Returned"
+              className="hover:!text-amber-600"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedOrderForReturn(row);
+                setReturnDialogOpen(true);
+              }}
+            >
+              <AssignmentReturnIcon sx={{ fontSize: 16 }} />
+            </IconButton>
           )}
 
           {/* Cancel */}
           {(row.orderStatus === "Pending" ||
             row.orderStatus === "Processing") && (
-            <button
-              type="button"
+            <Button
+              variant="soft"
+              tone="danger"
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedOrderForCancel(row);
                 setCancelDialogOpen(true);
               }}
-              className="px-2 py-1 rounded bg-rose-50 text-rose-700 hover:bg-rose-100 font-semibold text-xs transition"
             >
               Cancel
-            </button>
+            </Button>
           )}
 
           {/* Delete */}
-          <Tooltip title="Delete Order">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedOrderForDelete(row);
-                setDeleteDialogOpen(true);
-              }}
-              className="p-1.5 rounded text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition"
-            >
-              <DeleteOutlineIcon sx={{ fontSize: 16 }} />
-            </button>
-          </Tooltip>
+          <IconButton
+            label="Delete Order"
+            tone="danger"
+            onClick={(e) => {
+              e.stopPropagation();
+              setSelectedOrderForDelete(row);
+              setDeleteDialogOpen(true);
+            }}
+          >
+            <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+          </IconButton>
         </div>
       ),
     },
@@ -388,17 +382,14 @@ export default function OrdersPage() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<FileDownloadIcon />}
               onClick={handleExport}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Export CSV
             </Button>
             <Button
-              variant="contained"
-              size="small"
               startIcon={<AddIcon />}
               onClick={() => {
                 setEditingOrder(null);

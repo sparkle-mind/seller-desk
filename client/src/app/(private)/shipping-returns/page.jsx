@@ -24,13 +24,12 @@ import {
   editRtoRecord,
   updateRtoStatus,
 } from "@/store/slices/shippingReturnsSlice";
-import { adjustStock } from "@/store/slices/productsSlice";
-import { addMovement } from "@/store/slices/inventorySlice";
 import { formatCurrency, formatDate } from "@/lib/formatters";
 import { exportToCsv } from "@/lib/exportCsv";
 
 // MUI
-import Button from "@mui/material/Button";
+import Button from "@/components/common/Button";
+import IconButton from "@/components/common/IconButton";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Tooltip from "@mui/material/Tooltip";
@@ -47,7 +46,6 @@ export default function ShippingReturnsPage() {
   const dispatch = useDispatch();
   const router = useRouter();
   const { shipments, returns, rtos } = useSelector((state) => state.shippingReturns);
-  const products = useSelector((state) => state.products.items);
   // Merge returned orders from the orders slice into the Customer Returns tab
   const orders = useSelector((state) => state.orders.items);
   const returnedOrdersAsReturns = orders
@@ -209,34 +207,9 @@ export default function ShippingReturnsPage() {
     setInspectionDialogOpen(true);
   };
 
+  // Restocking an Eligible return is handled by the sync layer (store/syncListeners.js)
   const handleInspectionSubmit = (data) => {
     dispatch(updateReturnInspection(data));
-
-    // If marked Eligible and not previously restocked, increment stock!
-    if (data.restockEligibility === "Eligible") {
-      const returnRec = returns.find((r) => r.id === data.id);
-      if (returnRec && !returnRec.restocked) {
-        const prod = products.find(
-          (p) => p.sku === returnRec.sku || p.name === returnRec.productName
-        );
-        if (prod) {
-          dispatch(adjustStock({ productId: prod.id, newStock: prod.stock + 1 }));
-          dispatch(
-            addMovement({
-              productId: prod.id,
-              productName: prod.name,
-              sku: prod.sku,
-              type: "Return Restock",
-              quantity: 1,
-              previousStock: prod.stock,
-              newStock: prod.stock + 1,
-              reason: `Customer return restocked after quality inspection (${data.id})`,
-              referenceId: data.id,
-            })
-          );
-        }
-      }
-    }
   };
 
   const handleReturnFormSubmit = (data) => {
@@ -256,6 +229,7 @@ export default function ShippingReturnsPage() {
     }
   };
 
+  // The sync layer restocks the original order's product when an RTO is received
   const handleMarkRtoReceived = (rto) => {
     dispatch(
       updateRtoStatus({
@@ -265,26 +239,6 @@ export default function ShippingReturnsPage() {
         notes: "Verified intact and restocked to inventory.",
       })
     );
-
-    if (!rto.restocked) {
-      const matchedProd = products[0];
-      if (matchedProd) {
-        dispatch(adjustStock({ productId: matchedProd.id, newStock: matchedProd.stock + 1 }));
-        dispatch(
-          addMovement({
-            productId: matchedProd.id,
-            productName: matchedProd.name,
-            sku: matchedProd.sku,
-            type: "Return Restock",
-            quantity: 1,
-            previousStock: matchedProd.stock,
-            newStock: matchedProd.stock + 1,
-            reason: `RTO delivery package verified & restocked (${rto.id})`,
-            referenceId: rto.id,
-          })
-        );
-      }
-    }
   };
 
   const handleExport = () => {
@@ -407,24 +361,23 @@ export default function ShippingReturnsPage() {
       render: (_, row) => (
         <div className="flex items-center justify-end gap-1.5">
           {row.deliveryStatus !== "Delivered" && !row.deliveryStatus.includes("Delivered") && (
-            <button
-              type="button"
+            <Button
+              variant="soft"
+              tone="success"
               onClick={() => handleQuickMarkDelivered(row.id)}
-              className="px-2 py-1 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold text-xs transition"
               title="Quick mark as delivered"
             >
               Delivered
-            </button>
+            </Button>
           )}
 
-          <button
-            type="button"
+          <IconButton
+            label="Edit shipment & courier tracking"
+            tone="primary"
             onClick={() => handleOpenEditShipment(row)}
-            className="p-1.5 rounded text-slate-500 hover:text-blue-600 hover:bg-slate-100 transition"
-            title="Edit shipment & courier tracking"
           >
             <EditIcon sx={{ fontSize: 17 }} />
-          </button>
+          </IconButton>
         </div>
       ),
     },
@@ -502,26 +455,23 @@ export default function ShippingReturnsPage() {
       align: "right",
       render: (_, row) => (
         <div className="flex items-center justify-end gap-1">
-          <button
-            type="button"
+          <Button
+            variant="soft"
+            startIcon={<RateReviewIcon sx={{ fontSize: 16 }} />}
             onClick={() => handleOpenInspection(row)}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold text-xs transition"
           >
-            <RateReviewIcon sx={{ fontSize: 16 }} />
-            <span>Inspect</span>
-          </button>
+            Inspect
+          </Button>
 
-          <button
-            type="button"
+          <IconButton
+            label="Edit Return Details"
             onClick={() => {
               setEditingReturn(row);
               setReturnFormOpen(true);
             }}
-            className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
-            title="Edit Return Details"
           >
             <EditIcon sx={{ fontSize: 16 }} />
-          </button>
+          </IconButton>
         </div>
       ),
     },
@@ -591,27 +541,25 @@ export default function ShippingReturnsPage() {
       render: (_, row) => (
         <div className="flex items-center justify-end gap-1.5">
           {row.rtoStatus !== "Received Back & Verified" && (
-            <button
-              type="button"
+            <Button
+              variant="soft"
+              tone="success"
+              startIcon={<CheckCircleIcon sx={{ fontSize: 16 }} />}
               onClick={() => handleMarkRtoReceived(row)}
-              className="inline-flex items-center gap-1 px-2 py-1 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold text-xs transition"
             >
-              <CheckCircleIcon sx={{ fontSize: 16 }} />
-              <span>Verify &amp; Restock</span>
-            </button>
+              Verify &amp; Restock
+            </Button>
           )}
 
-          <button
-            type="button"
+          <IconButton
+            label="Edit RTO Record"
             onClick={() => {
               setEditingRto(row);
               setRtoFormOpen(true);
             }}
-            className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
-            title="Edit RTO Record"
           >
             <EditIcon sx={{ fontSize: 16 }} />
-          </button>
+          </IconButton>
         </div>
       ),
     },
@@ -626,19 +574,16 @@ export default function ShippingReturnsPage() {
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<FileDownloadIcon />}
               onClick={handleExport}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Export {currentTab === 0 ? "Shipments" : currentTab === 1 ? "Returns" : "RTO"} CSV
             </Button>
 
             {currentTab === 1 && (
               <Button
-                variant="contained"
-                size="small"
                 startIcon={<AddIcon />}
                 onClick={() => {
                   setEditingReturn(null);
@@ -651,8 +596,6 @@ export default function ShippingReturnsPage() {
 
             {currentTab === 2 && (
               <Button
-                variant="contained"
-                size="small"
                 startIcon={<AddIcon />}
                 onClick={() => {
                   setEditingRto(null);

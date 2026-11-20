@@ -25,14 +25,11 @@ import { formatCurrency, formatDate } from "@/lib/formatters";
 import { exportToCsv } from "@/lib/exportCsv";
 
 // MUI
-import Button from "@mui/material/Button";
+import Button from "@/components/common/Button";
+import IconButton from "@/components/common/IconButton";
+import Modal from "@/components/common/Modal";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Tooltip from "@mui/material/Tooltip";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
@@ -292,28 +289,20 @@ export default function FinancePage() {
       align: "right",
       render: (_, row) => (
         <div className="flex items-center justify-end gap-1">
-          <Tooltip title="Edit Expense">
-            <button
-              type="button"
-              onClick={() => handleOpenEdit(row)}
-              className="p-1.5 rounded text-slate-500 hover:text-blue-600 hover:bg-slate-100 transition"
-            >
-              <EditIcon sx={{ fontSize: 18 }} />
-            </button>
-          </Tooltip>
+          <IconButton label="Edit Expense" tone="primary" onClick={() => handleOpenEdit(row)}>
+            <EditIcon sx={{ fontSize: 18 }} />
+          </IconButton>
 
-          <Tooltip title="Delete Expense">
-            <button
-              type="button"
-              onClick={() => {
-                setDeletingExpId(row.id);
-                setDeleteDialogOpen(true);
-              }}
-              className="p-1.5 rounded text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition"
-            >
-              <DeleteOutlineIcon sx={{ fontSize: 18 }} />
-            </button>
-          </Tooltip>
+          <IconButton
+            label="Delete Expense"
+            tone="danger"
+            onClick={() => {
+              setDeletingExpId(row.id);
+              setDeleteDialogOpen(true);
+            }}
+          >
+            <DeleteOutlineIcon sx={{ fontSize: 18 }} />
+          </IconButton>
         </div>
       ),
     },
@@ -394,18 +383,17 @@ export default function FinancePage() {
       align: "right",
       render: (_, row) =>
         row.status !== "Settled" && (
-          <button
-            type="button"
+          <Button
+            variant="soft"
+            startIcon={<CheckCircleIcon sx={{ fontSize: 16 }} />}
             onClick={() => {
               setSelectedSettlement(row);
               setUtrInput(`UTR${Date.now().toString().slice(-8)}`);
               setSettlementDialogOpen(true);
             }}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold text-xs transition"
           >
-            <CheckCircleIcon sx={{ fontSize: 16 }} />
-            <span>Mark Settled</span>
-          </button>
+            Mark Settled
+          </Button>
         ),
     },
   ];
@@ -419,20 +407,14 @@ export default function FinancePage() {
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<FileDownloadIcon />}
               onClick={handleExport}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Export CSV
             </Button>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={handleOpenAdd}
-            >
+            <Button startIcon={<AddIcon />} onClick={handleOpenAdd}>
               Record Expense
             </Button>
           </div>
@@ -814,64 +796,45 @@ export default function FinancePage() {
       />
 
       {/* Mark Settlement Received Modal */}
-      <Dialog
+      <Modal
         open={settlementDialogOpen}
         onClose={() => setSettlementDialogOpen(false)}
-        maxWidth="xs"
-        fullWidth
+        size="xs"
+        title="Confirm Settlement Payout"
+        icon={CurrencyRupeeIcon}
+        tone="emerald"
+        onSubmit={handleSettlePayoutSubmit}
+        submitLabel="Confirm Received"
+        contentClassName="space-y-3"
       >
-        <form onSubmit={handleSettlePayoutSubmit}>
-          <DialogTitle className="text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-            Confirm Settlement Payout
-          </DialogTitle>
-          <DialogContent className="space-y-3 pt-4">
-            <div className="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
-              <div className="font-bold text-slate-800">
-                Settlement: {selectedSettlement?.id} (
-                {selectedSettlement?.marketplace})
-              </div>
-              <div className="text-slate-600">
-                Cycle: {selectedSettlement?.cyclePeriod}
-              </div>
-              <div className="text-slate-800 font-bold text-sm">
-                Net Payout:{" "}
-                {formatCurrency(selectedSettlement?.netPayoutAmount)}
-              </div>
-            </div>
+        <div className="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
+          <div className="font-bold text-slate-800">
+            Settlement: {selectedSettlement?.id} (
+            {selectedSettlement?.marketplace})
+          </div>
+          <div className="text-slate-600">
+            Cycle: {selectedSettlement?.cyclePeriod}
+          </div>
+          <div className="text-slate-800 font-bold text-sm">
+            Net Payout:{" "}
+            {formatCurrency(selectedSettlement?.netPayoutAmount)}
+          </div>
+        </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Bank UTR / Transaction Reference #
-              </label>
-              <input
-                type="text"
-                value={utrInput}
-                onChange={(e) => setUtrInput(e.target.value)}
-                placeholder="e.g. HDFC00921820"
-                className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono"
-                required
-              />
-            </div>
-          </DialogContent>
-          <DialogActions className="p-4 border-t border-slate-100">
-            <Button
-              onClick={() => setSettlementDialogOpen(false)}
-              variant="outlined"
-              size="small"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              size="small"
-            >
-              Confirm Received
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
+            Bank UTR / Transaction Reference #
+          </label>
+          <input
+            type="text"
+            value={utrInput}
+            onChange={(e) => setUtrInput(e.target.value)}
+            placeholder="e.g. HDFC00921820"
+            className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg font-mono"
+            required
+          />
+        </div>
+      </Modal>
     </div>
   );
 }

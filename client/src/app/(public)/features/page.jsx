@@ -27,10 +27,10 @@ export default function FeaturesPage() {
       >
         <nav aria-label="Jump to a module" className="mx-auto flex max-w-3xl flex-wrap justify-center gap-2">
           {modules.map(({ key, title, Icon }) => (
-            <a key={key} href={`#${key}`} className="sd-pub-pill transition hover:-translate-y-0.5" style={{ paddingLeft: "0.7rem" }}>
+            <Link key={key} href={`#${key}`} className="sd-pub-pill transition hover:-translate-y-0.5" style={{ paddingLeft: "0.7rem" }}>
               <Icon sx={{ fontSize: 15 }} style={{ color: "var(--brand-text)" }} />
               {title}
-            </a>
+            </Link>
           ))}
         </nav>
       </PageHero>

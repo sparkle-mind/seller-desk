@@ -128,6 +128,17 @@ const ordersSlice = createSlice({
         saveToStorage(state.items);
       }
     },
+    // ── Internal: used by the sync layer (store/syncListeners.js) to link
+    // records (shipmentId, committed stock, status mirrored from shipments).
+    // Not listened to, so it can never start a sync loop.
+    syncOrderFields: (state, action) => {
+      const { id, changes } = action.payload;
+      const order = state.items.find((o) => o.id === id);
+      if (order) {
+        Object.assign(order, changes);
+        saveToStorage(state.items);
+      }
+    },
     resetOrders: (state) => {
       state.items = initialOrders;
       saveToStorage(initialOrders);
@@ -145,6 +156,7 @@ export const {
   markPacked,
   markShipped,
   cancelOrder,
+  syncOrderFields,
   resetOrders,
 } = ordersSlice.actions;
 

@@ -27,15 +27,12 @@ import { formatCurrency, formatDate } from "@/lib/formatters";
 import { exportToCsv } from "@/lib/exportCsv";
 
 // MUI
-import Button from "@mui/material/Button";
+import Button from "@/components/common/Button";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
+import IconButton from "@/components/common/IconButton";
+import Modal from "@/components/common/Modal";
 import TextField from "@mui/material/TextField";
-import Tooltip from "@mui/material/Tooltip";
 import BusinessIcon from "@mui/icons-material/Business";
 import PostAddIcon from "@mui/icons-material/PostAdd";
 import AddIcon from "@mui/icons-material/Add";
@@ -309,28 +306,24 @@ export default function SuppliersPurchasesPage() {
       align: "right",
       render: (_, row) => (
         <div className="flex items-center justify-end gap-1">
-          <Tooltip title="Edit Supplier">
-            <button
-              type="button"
-              onClick={() => handleOpenEditSupplier(row)}
-              className="p-1.5 rounded text-slate-500 hover:text-blue-600 hover:bg-slate-100 transition"
-            >
-              <EditIcon sx={{ fontSize: 18 }} />
-            </button>
-          </Tooltip>
+          <IconButton
+            label="Edit Supplier"
+            tone="primary"
+            onClick={() => handleOpenEditSupplier(row)}
+          >
+            <EditIcon sx={{ fontSize: 18 }} />
+          </IconButton>
 
-          <Tooltip title="Delete Supplier">
-            <button
-              type="button"
-              onClick={() => {
-                setDeletingSupId(row.id);
-                setDeleteSupDialogOpen(true);
-              }}
-              className="p-1.5 rounded text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition"
-            >
-              <DeleteOutlineIcon sx={{ fontSize: 18 }} />
-            </button>
-          </Tooltip>
+          <IconButton
+            label="Delete Supplier"
+            tone="danger"
+            onClick={() => {
+              setDeletingSupId(row.id);
+              setDeleteSupDialogOpen(true);
+            }}
+          >
+            <DeleteOutlineIcon sx={{ fontSize: 18 }} />
+          </IconButton>
         </div>
       ),
     },
@@ -429,32 +422,31 @@ export default function SuppliersPurchasesPage() {
       render: (_, row) => (
         <div className="flex items-center justify-end gap-1.5">
           {row.status !== "Received" && (
-            <button
-              type="button"
+            <Button
+              variant="soft"
+              tone="success"
+              startIcon={<MoveToInboxIcon sx={{ fontSize: 16 }} />}
               onClick={() => {
                 setSelectedPoForReceive(row);
                 setReceiveDialogOpen(true);
               }}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold text-xs transition"
             >
-              <MoveToInboxIcon sx={{ fontSize: 16 }} />
-              <span>Receive</span>
-            </button>
+              Receive
+            </Button>
           )}
 
           {row.paymentStatus !== "Paid" && (
-            <button
-              type="button"
+            <Button
+              variant="soft"
+              startIcon={<PaymentsIcon sx={{ fontSize: 16 }} />}
               onClick={() => {
                 setSelectedPoForPay(row);
                 setPayAmount(row.totalAmount - (row.paidAmount || 0));
                 setPayDialogOpen(true);
               }}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold text-xs transition"
             >
-              <PaymentsIcon sx={{ fontSize: 16 }} />
-              <span>Pay</span>
-            </button>
+              Pay
+            </Button>
           )}
         </div>
       ),
@@ -470,18 +462,15 @@ export default function SuppliersPurchasesPage() {
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<FileDownloadIcon />}
               onClick={handleExport}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Export CSV
             </Button>
             {currentTab === 0 ? (
               <Button
-                variant="contained"
-                size="small"
                 startIcon={<AddIcon />}
                 onClick={handleOpenAddSupplier}
               >
@@ -489,8 +478,6 @@ export default function SuppliersPurchasesPage() {
               </Button>
             ) : (
               <Button
-                variant="contained"
-                size="small"
                 startIcon={<PostAddIcon />}
                 onClick={() => setPoDialogOpen(true)}
               >
@@ -685,56 +672,46 @@ export default function SuppliersPurchasesPage() {
       />
 
       {/* Pay Supplier Modal */}
-      <Dialog
+      <Modal
         open={payDialogOpen}
         onClose={() => setPayDialogOpen(false)}
-        maxWidth="xs"
-        fullWidth
+        size="xs"
+        title="Record Vendor Payment"
+        icon={PaymentsIcon}
+        tone="emerald"
+        onSubmit={handleConfirmPaySubmit}
+        submitLabel="Record Payment"
+        contentClassName="space-y-3"
       >
-        <form onSubmit={handleConfirmPaySubmit}>
-          <DialogTitle className="text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-            Record Vendor Payment
-          </DialogTitle>
-          <DialogContent className="space-y-3 pt-4">
-            <div className="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
-              <div className="font-bold text-slate-800">PO: {selectedPoForPay?.poNumber}</div>
-              <div className="text-slate-600">Supplier: {selectedPoForPay?.supplierName}</div>
-              <div className="text-slate-700">
-                Total PO Amount: <strong>{formatCurrency(selectedPoForPay?.totalAmount)}</strong>
-              </div>
-              <div className="text-slate-700">
-                Remaining Due:{" "}
-                <strong className="text-amber-700">
-                  {formatCurrency((selectedPoForPay?.totalAmount || 0) - (selectedPoForPay?.paidAmount || 0))}
-                </strong>
-              </div>
-            </div>
+        <div className="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
+          <div className="font-bold text-slate-800">PO: {selectedPoForPay?.poNumber}</div>
+          <div className="text-slate-600">Supplier: {selectedPoForPay?.supplierName}</div>
+          <div className="text-slate-700">
+            Total PO Amount: <strong>{formatCurrency(selectedPoForPay?.totalAmount)}</strong>
+          </div>
+          <div className="text-slate-700">
+            Remaining Due:{" "}
+            <strong className="text-amber-700">
+              {formatCurrency((selectedPoForPay?.totalAmount || 0) - (selectedPoForPay?.paidAmount || 0))}
+            </strong>
+          </div>
+        </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Payment Amount (₹) *
-              </label>
-              <input
-                type="number"
-                min="1"
-                max={(selectedPoForPay?.totalAmount || 0) - (selectedPoForPay?.paidAmount || 0)}
-                value={payAmount}
-                onChange={(e) => setPayAmount(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold"
-                required
-              />
-            </div>
-          </DialogContent>
-          <DialogActions className="p-4 border-t border-slate-100">
-            <Button onClick={() => setPayDialogOpen(false)} variant="outlined" size="small">
-              Cancel
-            </Button>
-            <Button type="submit" variant="contained" color="primary" size="small">
-              Record Payment
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
+            Payment Amount (₹) *
+          </label>
+          <input
+            type="number"
+            min="1"
+            max={(selectedPoForPay?.totalAmount || 0) - (selectedPoForPay?.paidAmount || 0)}
+            value={payAmount}
+            onChange={(e) => setPayAmount(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold"
+            required
+          />
+        </div>
+      </Modal>
     </div>
   );
 }

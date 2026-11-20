@@ -253,7 +253,114 @@ function buildTheme(tokens) {
     buildSharedTypography(),
     buildLapelsOverrides(tokens),
     buildMotionOverrides(),
+    buildModalOverrides(),
   );
+}
+
+// ─── Modal system: all modes ────────────────────────────────────────────────
+// One shared layout for every Dialog in the app. Desktop: centred card with a
+// fixed header and footer and a scrolling body. Phones (< 600px): a bottom
+// sheet with a grab handle, safe-area padding and full-width touch targets.
+// Colours come from CSS variables so light/dark and palettes just work.
+function buildModalOverrides() {
+  const mobile = "@media (max-width: 599.95px)";
+  const easeOut = "cubic-bezier(0.22, 1, 0.36, 1)";
+
+  return {
+    components: {
+      MuiDialog: {
+        defaultProps: { scroll: "paper" },
+        styleOverrides: {
+          container: {
+            [mobile]: { alignItems: "flex-end" },
+          },
+          paper: {
+            position: "relative",
+            margin: 24,
+            maxHeight: "calc(100% - 48px)",
+            borderRadius: 20,
+            overflow: "hidden",
+            backgroundColor: "var(--bg-surface)",
+            backgroundImage: "none",
+            border: "1px solid var(--border)",
+            boxShadow: "var(--shadow-popover)",
+            [mobile]: {
+              margin: 0,
+              width: "100%",
+              maxWidth: "100%",
+              maxHeight: "calc(100dvh - 16px)",
+              borderRadius: "22px 22px 0 0",
+              borderBottom: "none",
+              animation: `sd-sheet-in 320ms ${easeOut} both`,
+              // Grab handle
+              "&::before": {
+                content: '""',
+                position: "absolute",
+                top: 8,
+                left: "50%",
+                width: 36,
+                height: 4,
+                marginLeft: -18,
+                borderRadius: 999,
+                backgroundColor: "var(--border-strong)",
+                zIndex: 2,
+              },
+            },
+          },
+          paperFullWidth: {
+            width: "calc(100% - 48px)",
+            [mobile]: { width: "100%" },
+          },
+        },
+      },
+      MuiDialogTitle: {
+        styleOverrides: {
+          root: {
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 14,
+            padding: "18px 24px 16px",
+            fontFamily: "inherit",
+            fontSize: "inherit",
+            fontWeight: "inherit",
+            letterSpacing: "normal",
+            backgroundColor: "var(--bg-surface)",
+            borderBottom: "1px solid var(--border-subtle)",
+            [mobile]: { padding: "24px 18px 14px", gap: 12 },
+          },
+        },
+      },
+      MuiDialogContent: {
+        styleOverrides: {
+          root: {
+            padding: "20px 24px",
+            overscrollBehavior: "contain",
+            ".MuiDialogTitle-root + &": { paddingTop: 20 },
+            [mobile]: {
+              padding: "16px 18px",
+              ".MuiDialogTitle-root + &": { paddingTop: 16 },
+            },
+          },
+        },
+      },
+      MuiDialogActions: {
+        styleOverrides: {
+          root: {
+            gap: 10,
+            padding: "14px 24px",
+            backgroundColor: "var(--bg-surface2)",
+            borderTop: "1px solid var(--border-subtle)",
+            "& > :not(style) ~ :not(style)": { marginLeft: 0 },
+            "& > .MuiButton-root": { minHeight: 38, paddingLeft: 18, paddingRight: 18 },
+            [mobile]: {
+              padding: "12px 18px calc(12px + env(safe-area-inset-bottom))",
+              "& > .MuiButton-root": { flex: "1 1 0", minHeight: 44, fontSize: "0.875rem" },
+            },
+          },
+        },
+      },
+    },
+  };
 }
 
 // ─── Motion: all modes ──────────────────────────────────────────────────────

@@ -11,18 +11,35 @@ import Divider from "@mui/material/Divider";
 import SettingsIcon from "@mui/icons-material/Settings";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import StorefrontIcon from "@mui/icons-material/Storefront";
+import LogoutIcon from "@mui/icons-material/Logout";
+import Popover from "@mui/material/Popover";
+import NotificationsOffOutlinedIcon from "@mui/icons-material/NotificationsOffOutlined";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Link from "next/link";
 import dayjs from "dayjs";
-import { useDispatch } from "react-redux";
-import { resetProducts } from "@/store/slices/productsSlice";
-import { resetOrders } from "@/store/slices/ordersSlice";
-import { resetInventory } from "@/store/slices/inventorySlice";
+import { useDispatch, useSelector } from "react-redux";
 import ThemeToggle from "@/components/common/ThemeToggle";
+import Button from "@/components/common/Button";
+import IconButton from "@/components/common/IconButton";
+import SignOutDialog from "@/components/common/SignOutDialog";
+import NotificationItem from "@/features/notifications/NotificationItem";
+import { sortNewestFirst } from "@/features/notifications/notificationMeta";
+import {
+  markNotificationRead,
+  markAllNotificationsRead,
+  selectUnreadCount,
+} from "@/store/slices/notificationsSlice";
+
+const HEADER_NOTIFICATION_LIMIT = 5;
 
 export default function AppHeader({ onMenuToggle }) {
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
   const [notifAnchorEl, setNotifAnchorEl] = useState(null);
+  const [signOutOpen, setSignOutOpen] = useState(false);
+  const notifications = useSelector((state) => state.notifications.items);
+  const unreadCount = useSelector(selectUnreadCount);
+  const latest = sortNewestFirst(notifications).slice(0, HEADER_NOTIFICATION_LIMIT);
   const todayStr = dayjs().format("ddd, DD MMM YYYY");
 
   return (
@@ -82,40 +99,111 @@ export default function AppHeader({ onMenuToggle }) {
         <ThemeToggle />
 
         {/* Notifications */}
-        <button
-          type="button"
+        <IconButton
+          label={unreadCount ? `Notifications, ${unreadCount} unread` : "Notifications"}
+          size="md"
           onClick={(e) => setNotifAnchorEl(e.currentTarget)}
-          className="p-2 sd-icon-btn"
+          aria-haspopup="true"
+          aria-expanded={Boolean(notifAnchorEl)}
         >
-          <Badge badgeContent={3} color="primary" variant="dot" className="sd-notif-badge">
+          <Badge
+            badgeContent={unreadCount}
+            invisible={unreadCount === 0}
+            color="primary"
+            variant="dot"
+            className="sd-notif-badge"
+          >
             <NotificationsNoneIcon sx={{ fontSize: 22 }} />
           </Badge>
-        </button>
+        </IconButton>
 
-        <Menu
-          anchorEl={notifAnchorEl}
+        <Popover
           open={Boolean(notifAnchorEl)}
+          anchorEl={notifAnchorEl}
           onClose={() => setNotifAnchorEl(null)}
-          transformOrigin={{ horizontal: "right", vertical: "top" }}
-          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-          PaperProps={{ sx: { width: 320, p: 1 } }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+          PaperProps={{
+            sx: {
+              width: 360,
+              maxWidth: "calc(100vw - 24px)",
+              mt: 1,
+              borderRadius: "18px",
+              overflow: "hidden",
+              backgroundColor: "var(--bg-surface)",
+              border: "1px solid var(--border)",
+              boxShadow: "var(--shadow-popover)",
+            },
+          }}
         >
-          <div className="px-3 py-1.5 text-xs font-bold uppercase tracking-wider" style={{ color: "var(--text-tertiary)", borderBottom: "1px solid var(--border)" }}>
-            Recent Alerts
-          </div>
-          {[
-            { title: "New Flipkart Order OD40923488210", sub: "1x Fast Charging Power Bank received", color: "var(--text-primary)" },
-            { title: "Low Stock: Kolhapuri Sandals", sub: "SKU-FTW-011 is out of stock", color: "rgb(var(--amber-600-rgb))" },
-            { title: "Meesho Settlement Payout", sub: "₹70,848 credited for cycle Feb 15-21", color: "rgb(var(--emerald-500-rgb))" },
-          ].map((n, i) => (
-            <MenuItem key={i} onClick={() => setNotifAnchorEl(null)}>
-              <div>
-                <div className="text-xs font-semibold" style={{ color: n.color }}>{n.title}</div>
-                <div className="text-[11px]" style={{ color: "var(--text-tertiary)" }}>{n.sub}</div>
+          {/* Header */}
+          <div
+            className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-3"
+            style={{ borderBottom: "1px solid var(--border)" }}
+          >
+            <div>
+              <div className="text-[13px] font-bold font-display" style={{ color: "var(--text-primary)" }}>
+                Notifications
               </div>
-            </MenuItem>
-          ))}
-        </Menu>
+              <div className="text-[10px]" style={{ color: "var(--text-tertiary)" }}>
+                {unreadCount > 0 ? `${unreadCount} unread` : "You're all caught up"}
+              </div>
+            </div>
+            {unreadCount > 0 && (
+              <Button
+                variant="ghost"
+                onClick={() => dispatch(markAllNotificationsRead())}
+                className="!text-[11px]"
+                sx={{ color: "var(--brand-text)" }}
+              >
+                Mark all as read
+              </Button>
+            )}
+          </div>
+
+          {/* List */}
+          <div className="max-h-[360px] overflow-y-auto p-1.5 space-y-0.5">
+            {latest.length === 0 ? (
+              <div className="flex flex-col items-center text-center px-6 py-8">
+                <div
+                  className="sd-pop-in w-10 h-10 rounded-full flex items-center justify-center mb-2"
+                  style={{ backgroundColor: "var(--brand-soft)", color: "var(--brand-text)" }}
+                >
+                  <NotificationsOffOutlinedIcon sx={{ fontSize: 22 }} />
+                </div>
+                <div className="text-xs font-semibold" style={{ color: "var(--text-primary)" }}>
+                  No notifications yet
+                </div>
+                <div className="text-[11px] mt-0.5" style={{ color: "var(--text-tertiary)" }}>
+                  Order, stock and payout alerts will appear here.
+                </div>
+              </div>
+            ) : (
+              latest.map((n) => (
+                <NotificationItem
+                  key={n.id}
+                  notification={n}
+                  compact
+                  onOpen={(item) => {
+                    dispatch(markNotificationRead(item.id));
+                    setNotifAnchorEl(null);
+                  }}
+                />
+              ))
+            )}
+          </div>
+
+          {/* Footer */}
+          <Link
+            href="/notifications"
+            onClick={() => setNotifAnchorEl(null)}
+            className="flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold transition hover:bg-surface2"
+            style={{ borderTop: "1px solid var(--border)", color: "var(--brand-text)" }}
+          >
+            View all notifications
+            <ArrowForwardIcon sx={{ fontSize: 15 }} />
+          </Link>
+        </Popover>
 
         {/* User avatar */}
         <button
@@ -154,12 +242,30 @@ export default function AppHeader({ onMenuToggle }) {
             <ListItemIcon><SettingsIcon fontSize="small" /></ListItemIcon>
             <span className="text-xs" style={{ color: "var(--text-primary)" }}>Business Settings</span>
           </MenuItem>
+          <MenuItem component={Link} href="/notifications" onClick={() => setAnchorEl(null)}>
+            <ListItemIcon><NotificationsNoneIcon fontSize="small" /></ListItemIcon>
+            <span className="text-xs flex-1" style={{ color: "var(--text-primary)" }}>Notifications</span>
+            {unreadCount > 0 && (
+              <span
+                className="ml-2 min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold flex items-center justify-center"
+                style={{ backgroundColor: "var(--brand-soft-strong)", color: "var(--brand-text)" }}
+              >
+                {unreadCount}
+              </span>
+            )}
+          </MenuItem>
           <Divider />
           <MenuItem onClick={() => { setAnchorEl(null); localStorage.clear(); window.location.reload(); }}>
             <ListItemIcon><RestartAltIcon fontSize="small" className="text-amber-500" /></ListItemIcon>
             <span className="text-xs font-medium text-amber-600">Reset Demo Storage</span>
           </MenuItem>
+          <MenuItem onClick={() => { setAnchorEl(null); setSignOutOpen(true); }}>
+            <ListItemIcon><LogoutIcon fontSize="small" className="text-rose-500" /></ListItemIcon>
+            <span className="text-xs font-medium text-rose-600">Sign Out</span>
+          </MenuItem>
         </Menu>
+
+        <SignOutDialog open={signOutOpen} onClose={() => setSignOutOpen(false)} />
       </div>
     </header>
   );

@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import ProductImage from "@/components/common/ProductImage";
 import { useSelector, useDispatch } from "react-redux";
 import PageHeader from "@/components/common/PageHeader";
 import StatCard from "@/components/common/StatCard";
@@ -22,11 +23,8 @@ import {
 } from "@/lib/formatters";
 
 // MUI Icons & components
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
+import Button from "@/components/common/Button";
+import Modal from "@/components/common/Modal";
 import TextField from "@mui/material/TextField";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import WarehouseIcon from "@mui/icons-material/Warehouse";
@@ -176,31 +174,24 @@ export default function InventoryDetailPage() {
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<ArrowBackIcon />}
               onClick={() => router.push("/inventory")}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Back
             </Button>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<EditNoteIcon />}
-              onClick={() => setAdjustDialogOpen(true)}
-            >
+            <Button startIcon={<EditNoteIcon />} onClick={() => setAdjustDialogOpen(true)}>
               Adjust Stock
             </Button>
             <Button
-              variant="outlined"
-              size="small"
+              variant="outline"
+              tone="neutral"
               startIcon={<TuneIcon />}
               onClick={() => {
                 setNewReorderValue(product.reorderLevel || 15);
                 setReorderDialogOpen(true);
               }}
-              sx={{ borderColor: "var(--btn-neutral-border)", color: "var(--btn-neutral-text)" }}
             >
               Configure Threshold
             </Button>
@@ -211,9 +202,11 @@ export default function InventoryDetailPage() {
       {/* Top Inventory Status Banner */}
       <div className="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <img
-            src={product.image || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100"}
+          <ProductImage
+            src={product.image}
             alt={product.name}
+            width={56}
+            height={56}
             className="w-14 h-14 rounded-lg object-cover bg-slate-100 border border-slate-200 shrink-0"
           />
           <div>
@@ -232,27 +225,16 @@ export default function InventoryDetailPage() {
         {/* Quick Replenish Actions */}
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold text-slate-500 hidden sm:inline">Quick Stock In:</span>
-          <button
-            type="button"
-            onClick={() => handleQuickAdd(25)}
-            className="px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-bold transition border border-emerald-200"
-          >
-            +25 Units
-          </button>
-          <button
-            type="button"
-            onClick={() => handleQuickAdd(50)}
-            className="px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-bold transition border border-emerald-200"
-          >
-            +50 Units
-          </button>
-          <button
-            type="button"
-            onClick={() => handleQuickAdd(100)}
-            className="px-2.5 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-bold transition border border-emerald-200"
-          >
-            +100 Units
-          </button>
+          {[25, 50, 100].map((qty) => (
+            <Button
+              key={qty}
+              variant="soft"
+              tone="success"
+              onClick={() => handleQuickAdd(qty)}
+            >
+              +{qty} Units
+            </Button>
+          ))}
         </div>
       </div>
 
@@ -433,16 +415,15 @@ export default function InventoryDetailPage() {
                       {formatCurrency(v.stock * (v.cost || product.purchaseCost))}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button
-                        type="button"
+                      <Button
+                        variant="soft"
                         onClick={() => {
                           setEditingVariant(v);
                           setVariantStockInput(v.stock);
                         }}
-                        className="px-2.5 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold text-xs transition"
                       >
                         Edit Stock
-                      </button>
+                      </Button>
                     </td>
                   </tr>
                 ))}
@@ -526,91 +507,71 @@ export default function InventoryDetailPage() {
       />
 
       {/* Reorder Level Dialog */}
-      <Dialog
+      <Modal
         open={reorderDialogOpen}
         onClose={() => setReorderDialogOpen(false)}
-        maxWidth="xs"
-        fullWidth
+        size="xs"
+        title="Configure Low-Stock Reorder Threshold"
+        icon={TuneIcon}
+        tone="amber"
+        onSubmit={handleSaveReorder}
+        submitLabel="Save Threshold"
+        contentClassName="space-y-3"
       >
-        <form onSubmit={handleSaveReorder}>
-          <DialogTitle className="text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-            Configure Low-Stock Reorder Threshold
-          </DialogTitle>
-          <DialogContent className="space-y-3 pt-4">
-            <p className="text-xs text-slate-600">
-              When available stock falls at or below this count, SellerDesk triggers a low-stock alert.
-            </p>
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Reorder Threshold Count (units) *
-              </label>
-              <input
-                type="number"
-                min="1"
-                value={newReorderValue}
-                onChange={(e) => setNewReorderValue(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold"
-                required
-              />
-            </div>
-          </DialogContent>
-          <DialogActions className="p-4 border-t border-slate-100">
-            <Button onClick={() => setReorderDialogOpen(false)} variant="outlined" size="small">
-              Cancel
-            </Button>
-            <Button type="submit" variant="contained" color="primary" size="small">
-              Save Threshold
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+        <p className="text-xs text-slate-600">
+          When available stock falls at or below this count, SellerDesk triggers a low-stock alert.
+        </p>
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
+            Reorder Threshold Count (units) *
+          </label>
+          <input
+            type="number"
+            min="1"
+            value={newReorderValue}
+            onChange={(e) => setNewReorderValue(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold"
+            required
+          />
+        </div>
+      </Modal>
 
       {/* Variant Stock Dialog */}
-      <Dialog
+      <Modal
         open={Boolean(editingVariant)}
         onClose={() => setEditingVariant(null)}
-        maxWidth="xs"
-        fullWidth
+        size="xs"
+        title="Edit Variant Inventory"
+        subtitle={editingVariant?.sku}
+        icon={EditNoteIcon}
+        onSubmit={handleVariantStockSave}
+        submitLabel="Update Variant Stock"
+        contentClassName="space-y-3"
       >
-        <form onSubmit={handleVariantStockSave}>
-          <DialogTitle className="text-slate-900 font-bold text-base border-b border-slate-100 pb-3">
-            Edit Variant Inventory
-          </DialogTitle>
-          <DialogContent className="space-y-3 pt-4">
-            <div className="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
-              <div className="font-bold text-slate-800">SKU: {editingVariant?.sku}</div>
-              <div className="text-slate-600">
-                Size: {editingVariant?.size} • Color: {editingVariant?.color}
-              </div>
-              <div className="text-slate-700">
-                Current Count: <strong>{editingVariant?.stock} units</strong>
-              </div>
-            </div>
+        <div className="p-3 bg-slate-50 rounded-lg text-xs space-y-1">
+          <div className="font-bold text-slate-800">SKU: {editingVariant?.sku}</div>
+          <div className="text-slate-600">
+            Size: {editingVariant?.size} • Color: {editingVariant?.color}
+          </div>
+          <div className="text-slate-700">
+            Current Count: <strong>{editingVariant?.stock} units</strong>
+          </div>
+        </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                New Available Stock *
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={variantStockInput}
-                onChange={(e) => setVariantStockInput(e.target.value)}
-                className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold"
-                required
-              />
-            </div>
-          </DialogContent>
-          <DialogActions className="p-4 border-t border-slate-100">
-            <Button onClick={() => setEditingVariant(null)} variant="outlined" size="small">
-              Cancel
-            </Button>
-            <Button type="submit" variant="contained" color="primary" size="small">
-              Update Variant Stock
-            </Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+        <div>
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
+            New Available Stock *
+          </label>
+          <input
+            type="number"
+            min="0"
+            value={variantStockInput}
+            onChange={(e) => setVariantStockInput(e.target.value)}
+            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg font-bold"
+            required
+          />
+        </div>
+      </Modal>
     </div>
   );
 }
