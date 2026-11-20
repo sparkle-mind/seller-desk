@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -18,6 +18,11 @@ import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import LogoutIcon from "@mui/icons-material/Logout";
+import CategoryIcon from "@mui/icons-material/CategoryOutlined";
+import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
+import PaymentsOutlinedIcon from "@mui/icons-material/PaymentsOutlined";
+import TuneIcon from "@mui/icons-material/Tune";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Tooltip from "@mui/material/Tooltip";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import SignOutDialog from "@/components/common/SignOutDialog";
@@ -33,32 +38,59 @@ import { resetNotifications } from "@/store/slices/notificationsSlice";
 import { resetSettings } from "@/store/slices/settingsSlice";
 import { resetCalculator } from "@/store/slices/calculatorSlice";
 
-export const navigationItems = [
+// Sidebar structure: a top-level entry is either a plain link (has `href`)
+// or an accordion group (has `children`).
+export const navigationGroups = [
   { name: "Dashboard", href: "/dashboard", icon: DashboardIcon },
-  { name: "Products", href: "/products", icon: Inventory2Icon },
-  { name: "Inventory", href: "/inventory", icon: WarehouseIcon },
-  { name: "Orders", href: "/orders", icon: ShoppingCartIcon },
   {
-    name: "Shipping & Returns",
-    href: "/shipping-returns",
-    icon: LocalShippingIcon,
+    id: "catalog",
+    name: "Catalog & Stock",
+    icon: CategoryIcon,
+    children: [
+      { name: "Products", href: "/products", icon: Inventory2Icon },
+      { name: "Inventory", href: "/inventory", icon: WarehouseIcon },
+      { name: "Suppliers & Purchases", href: "/suppliers-purchases", icon: BusinessIcon },
+    ],
   },
   {
-    name: "Suppliers & Purchases",
-    href: "/suppliers-purchases",
-    icon: BusinessIcon,
+    id: "sales",
+    name: "Sales & Fulfilment",
+    icon: StorefrontOutlinedIcon,
+    children: [
+      { name: "Orders", href: "/orders", icon: ShoppingCartIcon },
+      { name: "Shipping & Returns", href: "/shipping-returns", icon: LocalShippingIcon },
+    ],
   },
   {
-    name: "Finance & Expenses",
-    href: "/finance",
-    icon: AccountBalanceWalletIcon,
+    id: "money",
+    name: "Finance & Insights",
+    icon: PaymentsOutlinedIcon,
+    children: [
+      { name: "Finance & Expenses", href: "/finance", icon: AccountBalanceWalletIcon },
+      { name: "Pricing Calculator", href: "/calculator", icon: CalculateIcon },
+      { name: "Reports & Analytics", href: "/reports", icon: BarChartIcon },
+    ],
   },
-  { name: "Pricing Calculator", href: "/calculator", icon: CalculateIcon },
-  { name: "Reports & Analytics", href: "/reports", icon: BarChartIcon },
-  { name: "How It Works", href: "/visual-flow", icon: AccountTreeIcon },
-  { name: "Notifications", href: "/notifications", icon: NotificationsNoneIcon },
-  { name: "Settings", href: "/settings", icon: SettingsIcon },
+  {
+    id: "workspace",
+    name: "Workspace",
+    icon: TuneIcon,
+    children: [
+      { name: "Notifications", href: "/notifications", icon: NotificationsNoneIcon },
+      { name: "Settings", href: "/settings", icon: SettingsIcon },
+      { name: "How It Works", href: "/visual-flow", icon: AccountTreeIcon },
+    ],
+  },
 ];
+
+// Flat list (used by the mobile bottom nav)
+export const navigationItems = navigationGroups.flatMap((g) => g.children || [g]);
+
+const isPathActive = (pathname, href) =>
+  href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+
+const groupForPath = (pathname) =>
+  navigationGroups.find((g) => g.children?.some((c) => isPathActive(pathname, c.href)))?.id ?? null;
 
 export default function AppSidebar({ onClose }) {
   const pathname = usePathname();
@@ -66,6 +98,61 @@ export default function AppSidebar({ onClose }) {
   const unreadCount = useSelector(selectUnreadCount);
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
+  // One group open at a time; follows the current route
+  const [openGroup, setOpenGroup] = useState(() => groupForPath(pathname));
+
+  useEffect(() => {
+    const active = groupForPath(pathname);
+    if (active) setOpenGroup(active);
+  }, [pathname]);
+
+  const toggleGroup = (id) => setOpenGroup((cur) => (cur === id ? null : id));
+
+  const unreadBadge = (
+    <span
+      className="ml-auto min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0"
+      style={{
+        backgroundColor: "var(--sidebar-active-bg)",
+        color: "var(--sidebar-active-text)",
+        boxShadow: "inset 0 0 0 1px var(--sidebar-active-border)",
+      }}
+      aria-label={`${unreadCount} unread`}
+    >
+      {unreadCount}
+    </span>
+  );
+
+  const renderLink = (item, nested = false, hidden = false) => {
+    const Icon = item.icon;
+    const isActive = isPathActive(pathname, item.href);
+    const showBadge = item.href === "/notifications" && unreadCount > 0;
+
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        onClick={onClose}
+        aria-current={isActive ? "page" : undefined}
+        tabIndex={hidden ? -1 : undefined}
+        className={`sd-nav-link flex items-center gap-3 rounded-xl font-medium transition-all duration-150 ${
+          nested ? "px-3 py-2 text-[13px]" : "px-3 py-2.5 text-sm"
+        } ${isActive ? "is-active" : ""}`}
+      >
+        <Icon sx={{ fontSize: nested ? 17 : 19 }} />
+        <span className="truncate">{item.name}</span>
+        {showBadge && unreadBadge}
+        {isActive && (
+          <span
+            className={`sd-pop-in ${showBadge ? "ml-2" : "ml-auto"} w-1.5 h-1.5 rounded-full shrink-0`}
+            style={{
+              backgroundColor: "var(--sidebar-active-indicator)",
+              boxShadow: "0 0 0 3px var(--sidebar-active-bg)",
+            }}
+          />
+        )}
+      </Link>
+    );
+  };
 
   const handleResetAllData = () => {
     dispatch(resetProducts());
@@ -171,50 +258,51 @@ export default function AppSidebar({ onClose }) {
         >
           Management Modules
         </div>
-        {navigationItems.map((item) => {
-          const Icon = item.icon;
-          const isActive =
-            item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href);
+        {navigationGroups.map((group) => {
+          if (!group.children) return renderLink(group);
+
+          const Icon = group.icon;
+          const isOpen = openGroup === group.id;
+          const hasActive = group.children.some((c) => isPathActive(pathname, c.href));
+          const hasUnread =
+            unreadCount > 0 && group.children.some((c) => c.href === "/notifications");
+          const panelId = `sd-nav-group-${group.id}`;
 
           return (
-            <Link
-              key={item.name}
-              href={item.href}
-              onClick={onClose}
-              className={`sd-nav-link
-                text-center flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
-                  isActive ? "is-active" : ""
+            <div key={group.id} className="pt-0.5">
+              <button
+                type="button"
+                onClick={() => toggleGroup(group.id)}
+                aria-expanded={isOpen}
+                aria-controls={panelId}
+                className={`sd-nav-link sd-nav-group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-150 ${
+                  hasActive ? "has-active" : ""
                 }`}
-            >
-              <Icon sx={{ fontSize: 19 }} />
-              <span className="truncate">{item.name}</span>
-              {item.href === "/notifications" && unreadCount > 0 && (
-                <span
-                  className="ml-auto min-w-[20px] h-5 px-1.5 rounded-full text-[10px] font-bold flex items-center justify-center shrink-0"
-                  style={{
-                    backgroundColor: "var(--sidebar-active-bg)",
-                    color: "var(--sidebar-active-text)",
-                    boxShadow: "inset 0 0 0 1px var(--sidebar-active-border)",
-                  }}
-                  aria-label={`${unreadCount} unread`}
-                >
-                  {unreadCount}
-                </span>
-              )}
-              {isActive && (
-                <span
-                  className={`sd-pop-in ${
-                    item.href === "/notifications" && unreadCount > 0 ? "ml-2" : "ml-auto"
-                  } w-1.5 h-1.5 rounded-full shrink-0`}
-                  style={{
-                    backgroundColor: "var(--sidebar-active-indicator)",
-                    boxShadow: "0 0 0 3px var(--sidebar-active-bg)",
-                  }}
+              >
+                <Icon sx={{ fontSize: 19 }} />
+                <span className="truncate">{group.name}</span>
+                {/* Unread count stays visible while its group is collapsed */}
+                {hasUnread && !isOpen ? (
+                  <span
+                    className="ml-auto w-2 h-2 rounded-full shrink-0"
+                    style={{ backgroundColor: "var(--sidebar-active-indicator)" }}
+                    aria-label={`${unreadCount} unread notifications`}
+                  />
+                ) : null}
+                <ExpandMoreIcon
+                  className={`sd-nav-chevron ${hasUnread && !isOpen ? "ml-1" : "ml-auto"} ${isOpen ? "is-open" : ""}`}
+                  sx={{ fontSize: 18 }}
                 />
-              )}
-            </Link>
+              </button>
+
+              <div id={panelId} className={`sd-nav-panel ${isOpen ? "is-open" : ""}`} aria-hidden={!isOpen}>
+                <div className="sd-nav-panel-inner">
+                  <div className="sd-nav-children ml-5 pl-2.5 mt-0.5 mb-1 space-y-0.5">
+                    {group.children.map((child) => renderLink(child, true, !isOpen))}
+                  </div>
+                </div>
+              </div>
+            </div>
           );
         })}
       </div>
