@@ -13,6 +13,7 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import CalculateIcon from "@mui/icons-material/Calculate";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
+import ApiIcon from "@mui/icons-material/Api";
 import SettingsIcon from "@mui/icons-material/Settings";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import StorefrontIcon from "@mui/icons-material/Storefront";
@@ -79,6 +80,7 @@ export const navigationGroups = [
       { name: "Notifications", href: "/notifications", icon: NotificationsNoneIcon },
       { name: "Settings", href: "/settings", icon: SettingsIcon },
       { name: "How It Works", href: "/visual-flow", icon: AccountTreeIcon },
+      { name: "API Integration", href: "/api-integration", icon: ApiIcon },
     ],
   },
 ];
