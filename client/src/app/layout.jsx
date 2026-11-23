@@ -4,6 +4,7 @@ import ThemeRegistry from "@/theme/ThemeRegistry";
 import ReduxProvider from "@/store/ReduxProvider";
 import AppLayout from "@/components/layout/AppLayout";
 import ToastProvider from "@/components/common/ToastProvider";
+import QueryProvider from "@/providers/QueryProvider";
 
 export const metadata = {
   title: "SellerDesk | E-commerce Business Management Dashboard",
@@ -38,11 +39,13 @@ export default function RootLayout({ children }) {
       <body id="__next-root">
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
         <ReduxProvider>
-          <ThemeRegistry>
-            <ToastProvider>
-              <AppLayout>{children}</AppLayout>
-            </ToastProvider>
-          </ThemeRegistry>
+          <QueryProvider>
+            <ThemeRegistry>
+              <ToastProvider>
+                <AppLayout>{children}</AppLayout>
+              </ToastProvider>
+            </ThemeRegistry>
+          </QueryProvider>
         </ReduxProvider>
       </body>
     </html>

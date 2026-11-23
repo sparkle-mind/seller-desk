@@ -1,5 +1,5 @@
 import React from "react";
-import AuthPage from "@/components/auth/AuthPage";
+import SignupForm from "@/components/auth/SignupForm";
 
 export const metadata = {
   title: "Create account | SellerDesk",
@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function SignupPage() {
-  return <AuthPage mode="signup" />;
+  return <SignupForm />;
 }

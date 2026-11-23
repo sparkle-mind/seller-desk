@@ -1,5 +1,5 @@
 import React from "react";
-import AuthPage from "@/components/auth/AuthPage";
+import ForgotPasswordForm from "@/components/auth/ForgotPasswordForm";
 
 export const metadata = {
   title: "Reset password | SellerDesk",
@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function ForgotPasswordPage() {
-  return <AuthPage mode="forgot" />;
+  return <ForgotPasswordForm />;
 }
