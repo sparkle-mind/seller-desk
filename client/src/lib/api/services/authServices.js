@@ -9,8 +9,6 @@ export const loginService = async (data) => {
   }
 };
 
-
-
 export const registerService = async (data) => {
   try {
     const response = await axios.post("/register", data);
@@ -18,4 +16,11 @@ export const registerService = async (data) => {
   } catch (error) {
     throw error;
   }
+};
+
+// LOGOUT
+export const logoutService = async () => {
+  const response = await axios.post("/logout", {});
+
+  return response.data;
 };
