@@ -109,22 +109,26 @@ function RouteScene({ info, stage, city }) {
   const delivered = stage === 4 && info.tone !== "danger";
 
   return (
-    <div className="relative h-24 sm:h-28" role="img" aria-label={`${info.title}: parcel ${Math.round(pos * 100)}% of the way to ${city}`}>
+    <div className="relative h-20 sm:h-28" role="img" aria-label={`${info.title}: parcel ${Math.round(pos * 100)}% of the way to ${city}`}>
       {/* origin + destination */}
-      <div className="absolute bottom-3 left-0 flex w-16 flex-col items-center sm:w-24">
-        <WarehouseIllustration className="w-14 sm:w-20" />
+      <div className="absolute bottom-3 left-0 flex w-11 flex-col items-center sm:w-24">
+        <WarehouseIllustration className="w-11 sm:w-20" />
       </div>
-      <div className="absolute bottom-3 right-0 flex w-16 flex-col items-center sm:w-24">
-        <HouseIllustration className="w-14 sm:w-20" delivered={delivered} />
+      <div className="absolute bottom-3 right-0 flex w-11 flex-col items-center sm:w-24">
+        <HouseIllustration className="w-11 sm:w-20" delivered={delivered} />
       </div>
 
-      {/* road */}
-      <div className="absolute bottom-4 left-14 right-14 sm:left-[5.5rem] sm:right-[5.5rem]">
-        <div className="relative h-3 rounded-full" style={{ backgroundColor: "var(--bg-surface3)" }}>
+      {/* road; --truck-w keeps the truck fully on the road at every width */}
+      <div className="absolute bottom-4 left-12 right-12 [--truck-w:3.75rem] sm:left-[5.5rem] sm:right-[5.5rem] sm:[--truck-w:7rem]">
+        <div className="relative h-2.5 rounded-full sm:h-3" style={{ backgroundColor: "var(--bg-surface3)" }}>
           {/* travelled distance: from the warehouse, or back from the customer for RTO */}
           <div
             className={`absolute inset-y-0 rounded-full transition-[width] duration-700 ${info.reverse ? "right-0" : "left-0"}`}
-            style={{ width: `${(info.reverse ? 1 - pos : pos) * 100}%`, backgroundColor: tone.solid, opacity: 0.85 }}
+            style={{
+              width: `calc(${info.reverse ? 1 - pos : pos} * (100% - var(--truck-w)) + var(--truck-w) / 2)`,
+              backgroundColor: tone.solid,
+              opacity: 0.85,
+            }}
           />
           <div className={`sd-road-dash absolute inset-x-2 top-1/2 h-[2px] -translate-y-1/2 ${info.moving ? "is-moving" : ""}`} />
         </div>
@@ -132,7 +136,7 @@ function RouteScene({ info, stage, city }) {
         {/* truck */}
         <div
           className="absolute bottom-1 transition-[left] duration-700 ease-out"
-          style={{ left: `${pos * 100}%`, transform: "translateX(-50%)" }}
+          style={{ left: `calc(${pos} * (100% - var(--truck-w)))`, width: "var(--truck-w)" }}
         >
           <div className={info.moving ? "sd-truck is-moving" : "sd-truck"} style={info.reverse ? { transform: "scaleX(-1)" } : undefined}>
             {info.moving && (
@@ -140,7 +144,7 @@ function RouteScene({ info, stage, city }) {
                 <i /><i /><i />
               </span>
             )}
-            <TruckIllustration className="w-20 sm:w-28" tone={info.tone === "danger" ? "danger" : delivered ? "success" : "brand"} />
+            <TruckIllustration className="block w-full" tone={info.tone === "danger" ? "danger" : delivered ? "success" : "brand"} />
           </div>
         </div>
       </div>
@@ -152,9 +156,9 @@ function Stepper({ stage, info, shipment }) {
   const failed = info.tone === "danger";
   return (
     <ol className="relative mt-2 grid grid-cols-5">
-      <div className="absolute left-[10%] right-[10%] top-[17px] h-0.5" style={{ backgroundColor: "var(--border)" }} aria-hidden="true" />
+      <div className="absolute left-[10%] right-[10%] top-[15px] h-0.5 sm:top-[17px]" style={{ backgroundColor: "var(--border)" }} aria-hidden="true" />
       <div
-        className="absolute left-[10%] top-[17px] h-0.5 transition-[width] duration-700"
+        className="absolute left-[10%] top-[15px] h-0.5 transition-[width] duration-700 sm:top-[17px]"
         style={{ width: `${(stage / 4) * 80}%`, backgroundColor: TONE[info.tone].solid }}
         aria-hidden="true"
       />
@@ -169,7 +173,7 @@ function Stepper({ stage, info, shipment }) {
         return (
           <li key={s.key} className="relative flex flex-col items-center text-center" aria-current={current ? "step" : undefined}>
             <span
-              className={`relative z-[1] flex h-9 w-9 items-center justify-center rounded-full ${current ? "sd-step-pulse" : ""}`}
+              className={`relative z-[1] flex h-8 w-8 items-center justify-center rounded-full sm:h-9 sm:w-9 ${current ? "sd-step-pulse" : ""}`}
               style={
                 done || current
                   ? { backgroundColor: TONE[info.tone].solid, color: "var(--brand-contrast)", boxShadow: "0 0 0 4px var(--bg-surface)" }
@@ -179,7 +183,7 @@ function Stepper({ stage, info, shipment }) {
               <Icon sx={{ fontSize: 18 }} />
             </span>
             <span
-              className="mt-2 text-[11px] font-semibold leading-tight sm:text-xs"
+              className="mt-2 px-0.5 text-[10px] font-semibold leading-tight sm:text-xs"
               style={{ color: done || current ? "var(--text-primary)" : "var(--text-tertiary)" }}
             >
               {failed && i === stage ? "Returning" : s.label}

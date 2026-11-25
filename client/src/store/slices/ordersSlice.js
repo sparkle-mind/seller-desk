@@ -98,6 +98,56 @@ const ordersSlice = createSlice({
         saveToStorage(state.items);
       }
     },
+    // ── Set any order status (forward or backward) ────────────────
+    // Keeps shipment/payment fields consistent, so a wrong click can be
+    // undone by picking the previous status again.
+    setOrderStatus: (state, action) => {
+      const { orderId, orderStatus, courier, awbNumber, reason } = action.payload;
+      const order = state.items.find((o) => o.id === orderId);
+      if (!order) return;
+
+      const wasCancelled = order.orderStatus === "Cancelled";
+      const isCod = order.paymentMethod?.toLowerCase().includes("cash");
+      order.orderStatus = orderStatus;
+
+      if (orderStatus === "Pending" || orderStatus === "Processing") {
+        order.shipmentStatus = orderStatus === "Pending" ? "Pending" : "Ready for Pickup";
+        order.courier = "Unassigned";
+        order.awbNumber = null;
+        order.deliveredDate = null;
+      }
+      if (orderStatus === "Shipped") {
+        order.shipmentStatus = "In Transit";
+        order.deliveredDate = null;
+        if (courier) order.courier = courier;
+        if (awbNumber) order.awbNumber = awbNumber;
+      }
+      if (orderStatus === "Delivered") {
+        order.shipmentStatus = "Delivered";
+        order.paymentStatus = "Paid";
+        order.deliveredDate = order.deliveredDate || new Date().toISOString();
+      }
+      if (orderStatus === "Cancelled") {
+        order.shipmentStatus = "Cancelled";
+        order.paymentStatus = order.paymentStatus === "Paid" ? "Refunded" : "Cancelled";
+        order.cancellationReason = reason || "Cancelled by seller";
+      }
+      if (orderStatus === "Returned") {
+        order.shipmentStatus = "Returned to Origin";
+        order.returnReason = reason || "Returned by customer";
+      }
+
+      // Leaving a terminal state: undo its side effects.
+      if (orderStatus !== "Cancelled") {
+        delete order.cancellationReason;
+        if (wasCancelled && ["Refunded", "Cancelled"].includes(order.paymentStatus)) {
+          order.paymentStatus = isCod && orderStatus !== "Delivered" ? "Pending" : "Paid";
+        }
+      }
+      if (orderStatus !== "Returned") delete order.returnReason;
+
+      saveToStorage(state.items);
+    },
     markPacked: (state, action) => {
       const order = state.items.find((o) => o.id === action.payload);
       if (order) {
@@ -153,6 +203,7 @@ export const {
   deleteOrder,
   markReturned,
   updateOrderStatus,
+  setOrderStatus,
   markPacked,
   markShipped,
   cancelOrder,
