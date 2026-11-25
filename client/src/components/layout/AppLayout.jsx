@@ -9,7 +9,7 @@ import { navigationItems } from "./AppSidebar";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { isAuthRoute, isPublicRoute } from "@/lib/publicRoutes";
+import { isPrivateRoute } from "@/lib/publicRoutes";
 
 export default function AppLayout({ children }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -22,7 +22,8 @@ export default function AppLayout({ children }) {
     item.href === "/" ? pathname === "/" : pathname.startsWith(item.href),
   );
 
-  if (isAuthRoute(pathname) || isPublicRoute(pathname)) {
+  // Auth, public and unknown (404) routes render without the dashboard shell.
+  if (!isPrivateRoute(pathname)) {
     return <div className="min-h-[100dvh] sd-app-bg">{children}</div>;
   }
 

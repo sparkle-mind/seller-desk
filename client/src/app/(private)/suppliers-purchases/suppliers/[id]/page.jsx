@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { useToast } from "@/components/common/ToastProvider";
-import PageHeader from "@/components/common/PageHeader";
 import StatusChip from "@/components/common/StatusChip";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import SupplierFormDialog from "@/features/suppliers-purchases/SupplierFormDialog";
@@ -30,40 +29,130 @@ import IconButton from "@/components/common/IconButton";
 import Modal from "@/components/common/Modal";
 import TextField from "@mui/material/TextField";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import PostAddIcon from "@mui/icons-material/PostAdd";
-import BusinessIcon from "@mui/icons-material/Business";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import MoveToInboxIcon from "@mui/icons-material/MoveToInbox";
 import CancelIcon from "@mui/icons-material/Cancel";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import ShoppingCartCheckoutIcon from "@mui/icons-material/ShoppingCartCheckout";
-import ReceiptIcon from "@mui/icons-material/Receipt";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import PhoneIcon from "@mui/icons-material/Phone";
+import MailOutlineIcon from "@mui/icons-material/MailOutline";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
+import ScheduleIcon from "@mui/icons-material/Schedule";
+import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
+import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
+import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
+import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 
-function InfoRow({ label, value, mono = false, valueClass = "" }) {
+/* ────────────────────────── helpers ────────────────────────── */
+
+const card = {
+  backgroundColor: "var(--bg-surface)",
+  border: "1px solid var(--border)",
+  boxShadow: "var(--shadow-card)",
+};
+
+const initials = (name = "") =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+
+const isOpenPo = (po) => po.status !== "Received" && po.status !== "Cancelled";
+
+const PO_FILTERS = [
+  { key: "all", label: "All", match: () => true },
+  { key: "open", label: "Open", match: isOpenPo },
+  { key: "received", label: "Received", match: (po) => po.status === "Received" },
+  { key: "cancelled", label: "Cancelled", match: (po) => po.status === "Cancelled" },
+];
+
+/* ────────────────────────── building blocks ────────────────────────── */
+
+function Panel({ title, icon: Icon, aside, children, className = "", bodyClassName = "p-5" }) {
   return (
-    <div className="flex items-start justify-between py-1.5 border-b border-slate-100 last:border-0 gap-4">
-      <span className="text-xs text-slate-500 shrink-0">{label}</span>
-      <span className={`text-xs font-semibold text-right text-slate-800 ${mono ? "font-mono" : ""} ${valueClass}`}>
-        {value ?? "N/A"}
+    <section className={`rounded-2xl overflow-hidden ${className}`} style={card}>
+      <header
+        className="flex items-center justify-between gap-3 px-5 py-4"
+        style={{ borderBottom: "1px solid var(--border-subtle)" }}
+      >
+        <div className="flex items-center gap-2.5 min-w-0">
+          {Icon && (
+            <span
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+              style={{ backgroundColor: "var(--brand-soft)", color: "var(--brand-text)" }}
+            >
+              <Icon sx={{ fontSize: 18 }} />
+            </span>
+          )}
+          <h2 className="font-display text-base font-bold truncate" style={{ color: "var(--text-primary)" }}>
+            {title}
+          </h2>
+        </div>
+        {aside}
+      </header>
+      <div className={bodyClassName}>{children}</div>
+    </section>
+  );
+}
+
+function DetailItem({ icon: Icon, label, children, action }) {
+  return (
+    <div className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
+      <span
+        className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+        style={{ backgroundColor: "var(--bg-surface2)", color: "var(--text-tertiary)" }}
+      >
+        <Icon sx={{ fontSize: 17 }} />
       </span>
+      <div className="min-w-0 flex-1">
+        <div className="text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
+          {label}
+        </div>
+        <div className="mt-0.5 text-sm font-semibold break-words" style={{ color: "var(--text-primary)" }}>
+          {children}
+        </div>
+      </div>
+      {action}
     </div>
   );
 }
 
-function SectionCard({ title, icon: Icon, children, className = "" }) {
+function MetaPill({ icon: Icon, children }) {
   return (
-    <div className={`bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden ${className}`}>
-      <div className="flex items-center gap-2 px-5 py-3.5 border-b border-slate-100">
-        {Icon && <Icon sx={{ fontSize: 18 }} className="text-blue-600" />}
-        <h3 className="text-sm font-bold text-slate-900">{title}</h3>
-      </div>
-      <div className="p-5">{children}</div>
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium"
+      style={{
+        backgroundColor: "var(--bg-surface2)",
+        border: "1px solid var(--border)",
+        color: "var(--text-secondary)",
+      }}
+    >
+      {Icon && <Icon sx={{ fontSize: 14 }} />}
+      {children}
+    </span>
+  );
+}
+
+function ProgressBar({ value, tone = "emerald", height = "h-2" }) {
+  const pct = Math.max(0, Math.min(100, value));
+  return (
+    <div className={`w-full overflow-hidden rounded-full ${height}`} style={{ backgroundColor: "var(--bg-surface3)" }}>
+      <div
+        className={`h-full rounded-full transition-all duration-500 ${tone === "amber" ? "bg-amber-500" : "bg-emerald-500"}`}
+        style={{ width: `${pct}%` }}
+      />
     </div>
   );
 }
+
+/* ────────────────────────── page ────────────────────────── */
 
 export default function SupplierDetailPage() {
   const params = useParams();
@@ -75,7 +164,14 @@ export default function SupplierDetailPage() {
   const products = useSelector((state) => state.products.items);
 
   const supplier = suppliers.find((s) => s.id === params.id);
-  const supplierPOs = purchases.filter((p) => p.supplierId === params.id);
+  const supplierPOs = useMemo(
+    () =>
+      purchases
+        .filter((p) => p.supplierId === params.id)
+        .slice()
+        .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate)),
+    [purchases, params.id]
+  );
 
   // Dialog states
   const [editOpen, setEditOpen] = useState(false);
@@ -94,20 +190,30 @@ export default function SupplierDetailPage() {
   const [selectedPoForPay, setSelectedPoForPay] = useState(null);
   const [payAmount, setPayAmount] = useState("");
 
+  const [poFilter, setPoFilter] = useState("all");
+
   if (!supplier) {
     return (
-      <div className="p-8 text-center bg-white rounded-xl border border-slate-200">
-        <h2 className="text-lg font-bold text-slate-800">Supplier Not Found</h2>
-        <p className="text-sm text-slate-500 mt-1">
-          No supplier found with ID &quot;{params.id}&quot;.
-        </p>
-        <Link
-          href="/suppliers-purchases"
-          className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-semibold"
-        >
-          <ArrowBackIcon sx={{ fontSize: 16 }} />
-          <span>Back to Suppliers</span>
-        </Link>
+      <div className="flex min-h-[55vh] items-center justify-center">
+        <div className="w-full max-w-md rounded-2xl p-8 text-center" style={card}>
+          <span
+            className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl"
+            style={{ backgroundColor: "var(--brand-soft)", color: "var(--brand-text)" }}
+          >
+            <StorefrontOutlinedIcon sx={{ fontSize: 28 }} />
+          </span>
+          <h2 className="font-display text-xl font-bold" style={{ color: "var(--text-primary)" }}>
+            Supplier not found
+          </h2>
+          <p className="mt-1.5 text-sm" style={{ color: "var(--text-secondary)" }}>
+            No supplier exists with ID &quot;{params.id}&quot;. It may have been deleted.
+          </p>
+          <div className="mt-6">
+            <Button startIcon={<ArrowBackIcon />} onClick={() => router.push("/suppliers-purchases")}>
+              Back to suppliers
+            </Button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -177,126 +283,369 @@ export default function SupplierDetailPage() {
     setCancelPoOpen(false);
   };
 
-  // KPI summary
-  const totalPoValue = supplierPOs.reduce((s, p) => s + (p.totalAmount || 0), 0);
-  const pendingPoCount = supplierPOs.filter((p) => p.status === "Ordered").length;
-  const totalPaid = supplierPOs.reduce((s, p) => s + (p.paidAmount || 0), 0);
+  const copyToClipboard = async (value, label) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      toast.success(`${label} copied`);
+    } catch {
+      toast.error(`Couldn't copy ${label.toLowerCase()}`);
+    }
+  };
+
+  // Summary
+  const activePOs = supplierPOs.filter((p) => p.status !== "Cancelled");
+  const totalPoValue = activePOs.reduce((s, p) => s + (p.totalAmount || 0), 0);
+  const totalPaid = activePOs.reduce((s, p) => s + (p.paidAmount || 0), 0);
+  const paidPct = totalPoValue > 0 ? (totalPaid / totalPoValue) * 100 : 0;
+  const outstanding = supplier.outstandingBalance || 0;
+  const unitsSourced = supplierPOs
+    .filter((p) => p.status === "Received")
+    .reduce((s, p) => s + p.items.reduce((q, i) => q + i.quantity, 0), 0);
+  const lastOrder = supplierPOs[0];
+
+  const filterCounts = Object.fromEntries(
+    PO_FILTERS.map((f) => [f.key, supplierPOs.filter(f.match).length])
+  );
+  const activeFilter = PO_FILTERS.find((f) => f.key === poFilter) || PO_FILTERS[0];
+  const visiblePOs = supplierPOs.filter(activeFilter.match);
+
+  const location = [supplier.city, supplier.state].filter(Boolean).join(", ");
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={supplier.name}
-        subtitle={`${supplier.company} | ${supplier.city}, ${supplier.state} | GSTIN: ${supplier.gstin || "N/A"}`}
-        breadcrumbs={[
-          { label: "Suppliers & Purchases", href: "/suppliers-purchases" },
-          { label: supplier.name },
-        ]}
-        actions={
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button
-              variant="outline"
-              tone="neutral"
-              startIcon={<ArrowBackIcon />}
-              onClick={() => router.push("/suppliers-purchases")}
+      {/* Breadcrumb */}
+      <nav
+        aria-label="Breadcrumb"
+        className="flex items-center gap-1 overflow-x-auto whitespace-nowrap text-sm"
+        style={{ color: "var(--text-tertiary)" }}
+      >
+        <Link
+          href="/suppliers-purchases"
+          className="inline-flex items-center gap-1.5 rounded-lg py-1 pr-2 font-medium transition hover:opacity-80"
+          style={{ color: "var(--text-secondary)" }}
+        >
+          <ArrowBackIcon sx={{ fontSize: 16 }} />
+          Suppliers &amp; Purchases
+        </Link>
+        <ChevronRightIcon sx={{ fontSize: 16 }} style={{ color: "var(--breadcrumb-sep)" }} />
+        <span className="truncate font-medium" style={{ color: "var(--text-primary)" }}>
+          {supplier.name}
+        </span>
+      </nav>
+
+      {/* ── Hero ── */}
+      <section className="sd-rise-in relative overflow-hidden rounded-2xl p-5 sm:p-7" style={card}>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full blur-3xl"
+          style={{ backgroundColor: "var(--brand-soft)" }}
+        />
+        <div className="relative flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
+          <div className="flex min-w-0 items-start gap-4 sm:gap-5">
+            <div
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-lg font-bold sm:h-16 sm:w-16 sm:text-xl"
+              style={{
+                background: "linear-gradient(135deg, var(--brand-500, var(--brand)), var(--brand-700, var(--brand)))",
+                backgroundColor: "var(--brand)",
+                color: "var(--brand-contrast)",
+                boxShadow: "0 0 0 6px var(--bg-surface2)",
+              }}
             >
-              Back
-            </Button>
-            <Button
-              variant="outline"
-              tone="danger"
-              startIcon={<DeleteOutlineIcon />}
-              onClick={() => setDeleteOpen(true)}
-            >
-              Delete
-            </Button>
-            <Button
-              variant="outline"
-              tone="info"
-              startIcon={<PostAddIcon />}
-              onClick={() => setCreatePoOpen(true)}
-            >
+              {initials(supplier.name)}
+            </div>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1
+                  className="sd-page-title text-2xl font-bold tracking-tight sm:text-3xl"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  {supplier.name}
+                </h1>
+                <StatusChip status={supplier.status} />
+              </div>
+              <p className="mt-1 text-sm" style={{ color: "var(--text-secondary)" }}>
+                {supplier.company}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <MetaPill icon={StorefrontOutlinedIcon}>{supplier.id}</MetaPill>
+                {location && <MetaPill icon={LocationOnIcon}>{location}</MetaPill>}
+                {supplier.paymentTerms && <MetaPill icon={ScheduleIcon}>{supplier.paymentTerms}</MetaPill>}
+                <span
+                  className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium"
+                  style={{ border: "1px dashed var(--border-strong)", color: "var(--text-tertiary)" }}
+                >
+                  Demo Data
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 xl:justify-end">
+            <Button startIcon={<PostAddIcon />} onClick={() => setCreatePoOpen(true)}>
               New Purchase Order
             </Button>
-            <Button
-              startIcon={<EditIcon />}
-              onClick={() => setEditOpen(true)}
-            >
-              Edit Supplier
+            <Button variant="outline" tone="neutral" startIcon={<EditIcon />} onClick={() => setEditOpen(true)}>
+              Edit
             </Button>
+            <IconButton label="Delete supplier" tone="danger" size="md" onClick={() => setDeleteOpen(true)}>
+              <DeleteOutlineIcon sx={{ fontSize: 20 }} />
+            </IconButton>
           </div>
-        }
-      />
+        </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          {
-            label: "Total POs",
-            value: supplierPOs.length,
-            icon: ReceiptIcon,
-            color: "bg-blue-50 text-blue-600",
-          },
-          {
-            label: "Total PO Value",
-            value: formatCurrency(totalPoValue),
-            icon: ShoppingCartCheckoutIcon,
-            color: "bg-purple-50 text-purple-600",
-          },
-          {
-            label: "Total Paid",
-            value: formatCurrency(totalPaid),
-            icon: PaymentsIcon,
-            color: "bg-emerald-50 text-emerald-600",
-          },
-          {
-            label: "Outstanding Balance",
-            value: formatCurrency(supplier.outstandingBalance),
-            icon: AccountBalanceWalletIcon,
-            color: supplier.outstandingBalance > 0 ? "bg-amber-50 text-amber-600" : "bg-emerald-50 text-emerald-600",
-          },
-        ].map((card, i) => (
-          <div key={i} className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${card.color}`}>
-              <card.icon sx={{ fontSize: 22 }} />
-            </div>
+        {/* Quick contact strip */}
+        <div
+          className="relative mt-6 grid grid-cols-1 gap-2 pt-5 sm:grid-cols-3"
+          style={{ borderTop: "1px solid var(--border-subtle)" }}
+        >
+          {[
+            supplier.phone && {
+              icon: PhoneIcon,
+              label: "Call",
+              value: supplier.phone,
+              href: `tel:${supplier.phone.replace(/\s+/g, "")}`,
+            },
+            supplier.email && {
+              icon: MailOutlineIcon,
+              label: "Email",
+              value: supplier.email,
+              href: `mailto:${supplier.email}`,
+            },
+            {
+              icon: VerifiedOutlinedIcon,
+              label: "GSTIN",
+              value: supplier.gstin || "Not provided",
+              onClick: supplier.gstin ? () => copyToClipboard(supplier.gstin, "GSTIN") : undefined,
+              mono: true,
+            },
+          ]
+            .filter(Boolean)
+            .map((item) => {
+              const content = (
+                <>
+                  <span
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                    style={{ backgroundColor: "var(--bg-surface)", color: "var(--brand-text)", border: "1px solid var(--border)" }}
+                  >
+                    <item.icon sx={{ fontSize: 18 }} />
+                  </span>
+                  <span className="min-w-0 text-left">
+                    <span className="block text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
+                      {item.label}
+                    </span>
+                    <span
+                      className={`block truncate text-sm font-semibold ${item.mono ? "font-mono tracking-tight" : ""}`}
+                      style={{ color: "var(--text-primary)" }}
+                    >
+                      {item.value}
+                    </span>
+                  </span>
+                  {item.onClick && (
+                    <ContentCopyIcon sx={{ fontSize: 15 }} className="ml-auto shrink-0" style={{ color: "var(--text-tertiary)" }} />
+                  )}
+                </>
+              );
+              const cls =
+                "flex min-w-0 items-center gap-3 rounded-xl px-3 py-2.5 transition hover:brightness-[0.98]";
+              const style = { backgroundColor: "var(--bg-surface2)" };
+              if (item.href)
+                return (
+                  <a key={item.label} href={item.href} className={cls} style={style}>
+                    {content}
+                  </a>
+                );
+              if (item.onClick)
+                return (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={item.onClick}
+                    className={cls}
+                    style={style}
+                    title={`Copy ${item.label}`}
+                  >
+                    {content}
+                  </button>
+                );
+              return (
+                <div key={item.label} className={cls} style={style}>
+                  {content}
+                </div>
+              );
+            })}
+        </div>
+      </section>
+
+      {/* ── Payables overview ── */}
+      <section className="overflow-hidden rounded-2xl" style={card}>
+        <div className="p-5 sm:p-6">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <div className="text-[11px] text-slate-500 font-medium">{card.label}</div>
-              <div className="text-base font-bold text-slate-900 leading-tight">{card.value}</div>
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
+                <AccountBalanceWalletOutlinedIcon sx={{ fontSize: 16 }} />
+                Outstanding balance
+              </div>
+              <div
+                className={`font-display mt-1.5 text-3xl font-bold tracking-tight sm:text-4xl ${outstanding > 0 ? "text-amber-600" : "text-emerald-600"}`}
+              >
+                {formatCurrency(outstanding)}
+              </div>
+              <p className="mt-1 text-xs" style={{ color: "var(--text-secondary)" }}>
+                {outstanding > 0
+                  ? `Due to ${supplier.name} on ${supplier.paymentTerms || "agreed"} terms`
+                  : "All dues settled with this supplier"}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-6 sm:text-right">
+              <div>
+                <div className="text-xs" style={{ color: "var(--text-tertiary)" }}>Total billed</div>
+                <div className="mt-0.5 text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+                  {formatCurrency(totalPoValue)}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs" style={{ color: "var(--text-tertiary)" }}>Paid</div>
+                <div className="mt-0.5 text-lg font-bold text-emerald-600">{formatCurrency(totalPaid)}</div>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
+          <div className="mt-5">
+            <ProgressBar value={paidPct} />
+            <div className="mt-2 flex justify-between text-[11px]" style={{ color: "var(--text-tertiary)" }}>
+              <span>{Math.round(paidPct)}% of PO value paid</span>
+              <span>{formatCurrency(Math.max(0, totalPoValue - totalPaid))} unpaid on POs</span>
+            </div>
+          </div>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Supplier Info */}
+        <div
+          className="grid grid-cols-1 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0"
+          style={{ borderTop: "1px solid var(--border-subtle)", backgroundColor: "var(--bg-surface2)", borderColor: "var(--border-subtle)" }}
+        >
+          {[
+            { label: "Purchase orders", value: supplierPOs.length, sub: `${filterCounts.open} open`, icon: ReceiptLongIcon },
+            { label: "Units received", value: unitsSourced.toLocaleString("en-IN"), sub: "across received POs", icon: Inventory2OutlinedIcon },
+            {
+              label: "Last order",
+              value: lastOrder ? formatDate(lastOrder.orderDate, "DD MMM") : "None",
+              sub: lastOrder ? lastOrder.poNumber : "No POs yet",
+              icon: ScheduleIcon,
+            },
+          ].map((stat) => (
+            <div key={stat.label} className="flex min-w-0 items-center gap-3 px-5 py-4 sm:px-6" style={{ borderColor: "var(--border-subtle)" }}>
+              <span
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                style={{ backgroundColor: "var(--bg-surface)", color: "var(--text-tertiary)", border: "1px solid var(--border)" }}
+              >
+                <stat.icon sx={{ fontSize: 18 }} />
+              </span>
+              <div className="min-w-0">
+                <div className="truncate text-[11px] font-medium" style={{ color: "var(--text-tertiary)" }}>
+                  {stat.label}
+                </div>
+                <div className="text-base font-bold leading-tight" style={{ color: "var(--text-primary)" }}>
+                  {stat.value}
+                </div>
+                <div className="truncate text-[11px]" style={{ color: "var(--text-tertiary)" }}>
+                  {stat.sub}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Body ── */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Left: profile */}
         <div className="space-y-6">
-          {/* Contact Details */}
-          <SectionCard title="Contact Details" icon={BusinessIcon}>
-            <div className="space-y-0">
-              <InfoRow label="Contact Person" value={supplier.contactPerson || "Sales Desk"} />
-              <InfoRow label="Phone" value={supplier.phone} />
-              <InfoRow label="Email" value={supplier.email} />
-              <InfoRow label="Payment Terms" value={supplier.paymentTerms} />
-              <InfoRow label="Status" value={<StatusChip status={supplier.status} />} />
+          <Panel title="Contact" icon={PersonOutlineIcon}>
+            <div className="divide-y" style={{ borderColor: "var(--border-subtle)" }}>
+              <DetailItem icon={PersonOutlineIcon} label="Contact person">
+                {supplier.contactPerson || "Sales Desk"}
+              </DetailItem>
+              <DetailItem
+                icon={PhoneIcon}
+                label="Phone"
+                action={
+                  supplier.phone && (
+                    <IconButton label="Copy phone" onClick={() => copyToClipboard(supplier.phone, "Phone")}>
+                      <ContentCopyIcon sx={{ fontSize: 15 }} />
+                    </IconButton>
+                  )
+                }
+              >
+                {supplier.phone ? (
+                  <a href={`tel:${supplier.phone.replace(/\s+/g, "")}`} className="hover:underline">
+                    {supplier.phone}
+                  </a>
+                ) : (
+                  "N/A"
+                )}
+              </DetailItem>
+              <DetailItem
+                icon={MailOutlineIcon}
+                label="Email"
+                action={
+                  supplier.email && (
+                    <IconButton label="Copy email" onClick={() => copyToClipboard(supplier.email, "Email")}>
+                      <ContentCopyIcon sx={{ fontSize: 15 }} />
+                    </IconButton>
+                  )
+                }
+              >
+                {supplier.email ? (
+                  <a href={`mailto:${supplier.email}`} className="hover:underline">
+                    {supplier.email}
+                  </a>
+                ) : (
+                  "N/A"
+                )}
+              </DetailItem>
             </div>
-          </SectionCard>
+          </Panel>
 
-          {/* Location */}
-          <SectionCard title="Location & Legal" icon={LocationOnIcon}>
-            <div className="space-y-0">
-              <InfoRow label="City" value={supplier.city} />
-              <InfoRow label="State" value={supplier.state} />
-              <InfoRow label="GSTIN" value={supplier.gstin || "N/A"} mono />
-              <InfoRow label="Address" value={supplier.address || `${supplier.city}, ${supplier.state}`} />
+          <Panel title="Business & Legal" icon={VerifiedOutlinedIcon}>
+            <div className="divide-y" style={{ borderColor: "var(--border-subtle)" }}>
+              <DetailItem icon={StorefrontOutlinedIcon} label="Registered name">
+                {supplier.company || "N/A"}
+              </DetailItem>
+              <DetailItem
+                icon={VerifiedOutlinedIcon}
+                label="GSTIN"
+                action={
+                  supplier.gstin && (
+                    <IconButton label="Copy GSTIN" onClick={() => copyToClipboard(supplier.gstin, "GSTIN")}>
+                      <ContentCopyIcon sx={{ fontSize: 15 }} />
+                    </IconButton>
+                  )
+                }
+              >
+                <span className="font-mono tracking-tight">{supplier.gstin || "N/A"}</span>
+              </DetailItem>
+              <DetailItem icon={ScheduleIcon} label="Payment terms">
+                {supplier.paymentTerms || "N/A"}
+              </DetailItem>
+              <DetailItem icon={LocationOnIcon} label="Address">
+                <span className="font-medium leading-6">{supplier.address || location || "N/A"}</span>
+              </DetailItem>
             </div>
+
             {supplier.categories?.length > 0 && (
-              <div className="mt-3 pt-3 border-t border-slate-100">
-                <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5">Product Categories</div>
+              <div className="mt-5 pt-4" style={{ borderTop: "1px solid var(--border-subtle)" }}>
+                <div className="mb-2 text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
+                  Supplies
+                </div>
                 <div className="flex flex-wrap gap-1.5">
                   {supplier.categories.map((cat) => (
                     <span
                       key={cat}
-                      className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[11px] font-medium border border-blue-100"
+                      className="rounded-full px-2.5 py-1 text-xs font-medium"
+                      style={{
+                        backgroundColor: "var(--brand-soft)",
+                        color: "var(--brand-text)",
+                        border: "1px solid var(--brand-border)",
+                      }}
                     >
                       {cat}
                     </span>
@@ -304,137 +653,212 @@ export default function SupplierDetailPage() {
                 </div>
               </div>
             )}
-          </SectionCard>
+          </Panel>
         </div>
 
-        {/* Right 2 cols: Purchase Orders */}
+        {/* Right: purchase orders */}
         <div className="lg:col-span-2">
-          <SectionCard title={`Purchase Orders (${supplierPOs.length})`} icon={ReceiptIcon}>
+          <Panel
+            title="Purchase Orders"
+            icon={ReceiptLongIcon}
+            bodyClassName=""
+            aside={
+              supplierPOs.length > 0 && (
+                <Button variant="soft" startIcon={<PostAddIcon />} onClick={() => setCreatePoOpen(true)}>
+                  New PO
+                </Button>
+              )
+            }
+          >
             {supplierPOs.length === 0 ? (
-              <div className="text-center py-6 text-slate-400 text-sm">
-                No purchase orders for this supplier yet.
-                <div className="mt-2">
-                  <Button variant="outline" startIcon={<PostAddIcon />} onClick={() => setCreatePoOpen(true)}>
-                    Create First PO
+              <div className="px-6 py-14 text-center">
+                <span
+                  className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl"
+                  style={{ backgroundColor: "var(--bg-surface2)", color: "var(--text-tertiary)" }}
+                >
+                  <ReceiptLongIcon />
+                </span>
+                <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                  No purchase orders yet
+                </p>
+                <p className="mt-1 text-xs" style={{ color: "var(--text-tertiary)" }}>
+                  Raise your first PO to start tracking stock and payments with this supplier.
+                </p>
+                <div className="mt-4">
+                  <Button startIcon={<PostAddIcon />} onClick={() => setCreatePoOpen(true)}>
+                    Create first PO
                   </Button>
                 </div>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50 text-slate-600 uppercase font-semibold text-[10px] tracking-wider">
-                      <th className="px-3 py-2.5">PO #</th>
-                      <th className="px-3 py-2.5">Order Date</th>
-                      <th className="px-3 py-2.5">Items</th>
-                      <th className="px-3 py-2.5 text-right">Total</th>
-                      <th className="px-3 py-2.5 text-right">Paid</th>
-                      <th className="px-3 py-2.5">Status</th>
-                      <th className="px-3 py-2.5">Payment</th>
-                      <th className="px-3 py-2.5 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {supplierPOs.map((po) => (
-                      <tr key={po.id} className="hover:bg-slate-50 transition">
-                        <td className="px-3 py-2.5">
-                          <Link
-                            href={`/suppliers-purchases/po/${po.id}`}
-                            className="font-bold text-blue-600 hover:underline"
-                          >
-                            {po.poNumber}
-                          </Link>
-                          <div className="text-[10px] text-slate-400 mt-0.5">
-                            {po.receivedDate ? `Received: ${formatDate(po.receivedDate)}` : `ETA: ${formatDate(po.expectedDeliveryDate)}`}
-                          </div>
-                        </td>
-                        <td className="px-3 py-2.5 text-slate-600">{formatDate(po.orderDate)}</td>
-                        <td className="px-3 py-2.5">
-                          <div className="max-w-[150px]">
-                            <div className="truncate font-medium text-slate-800">{po.items[0]?.productName}</div>
-                            {po.items.length > 1 && (
-                              <div className="text-[10px] text-blue-600">+{po.items.length - 1} more</div>
-                            )}
-                            <div className="text-[10px] text-slate-400">
-                              Qty: {po.items.reduce((s, i) => s + i.quantity, 0)} units
+              <>
+                {/* Filter tabs */}
+                <div
+                  role="tablist"
+                  aria-label="Filter purchase orders"
+                  className="flex gap-1 overflow-x-auto px-5 pt-4"
+                >
+                  {PO_FILTERS.map((f) => {
+                    const active = f.key === poFilter;
+                    return (
+                      <button
+                        key={f.key}
+                        type="button"
+                        role="tab"
+                        aria-selected={active}
+                        onClick={() => setPoFilter(f.key)}
+                        className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition"
+                        style={
+                          active
+                            ? { backgroundColor: "var(--brand-soft-strong)", color: "var(--brand-text)", border: "1px solid var(--brand-border)" }
+                            : { color: "var(--text-secondary)", border: "1px solid transparent" }
+                        }
+                      >
+                        {f.label}
+                        <span
+                          className="rounded-md px-1.5 text-[10px]"
+                          style={{ backgroundColor: active ? "var(--bg-surface)" : "var(--bg-surface2)" }}
+                        >
+                          {filterCounts[f.key]}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {visiblePOs.length === 0 ? (
+                  <p className="px-5 py-10 text-center text-sm" style={{ color: "var(--text-tertiary)" }}>
+                    No {activeFilter.label.toLowerCase()} purchase orders.
+                  </p>
+                ) : (
+                  <ul className="mt-3 divide-y" style={{ borderTop: "1px solid var(--border-subtle)", borderColor: "var(--border-subtle)" }}>
+                    {visiblePOs.map((po) => {
+                      const paid = po.paidAmount || 0;
+                      const pct = po.totalAmount ? (paid / po.totalAmount) * 100 : 0;
+                      const qty = po.items.reduce((s, i) => s + i.quantity, 0);
+                      const open = isOpenPo(po);
+                      const canPay = po.paymentStatus !== "Paid" && po.status !== "Cancelled";
+
+                      return (
+                        <li
+                          key={po.id}
+                          className="grid grid-cols-1 gap-3 px-5 py-4 transition hover:bg-slate-50 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1fr)_auto] md:items-center md:gap-5"
+                          style={{ borderColor: "var(--border-subtle)" }}
+                        >
+                          {/* PO + dates */}
+                          <div className="min-w-0">
+                            <Link
+                              href={`/suppliers-purchases/po/${po.id}`}
+                              className="text-sm font-bold hover:underline"
+                              style={{ color: "var(--brand-text)" }}
+                            >
+                              {po.poNumber}
+                            </Link>
+                            <div className="mt-0.5 text-[11px]" style={{ color: "var(--text-tertiary)" }}>
+                              Ordered {formatDate(po.orderDate)}
+                            </div>
+                            <div className="text-[11px]" style={{ color: "var(--text-tertiary)" }}>
+                              {po.receivedDate
+                                ? `Received ${formatDate(po.receivedDate)}`
+                                : po.expectedDeliveryDate
+                                  ? `ETA ${formatDate(po.expectedDeliveryDate)}`
+                                  : null}
                             </div>
                           </div>
-                        </td>
-                        <td className="px-3 py-2.5 text-right font-bold text-slate-900">{formatCurrency(po.totalAmount)}</td>
-                        <td className="px-3 py-2.5 text-right text-slate-600">{formatCurrency(po.paidAmount || 0)}</td>
-                        <td className="px-3 py-2.5"><StatusChip status={po.status} /></td>
-                        <td className="px-3 py-2.5"><StatusChip status={po.paymentStatus} /></td>
-                        <td className="px-3 py-2.5">
-                          <div className="flex items-center justify-end gap-1">
-                            {/* Edit PO */}
-                            {po.status !== "Received" && po.status !== "Cancelled" && (
-                              <IconButton
-                                label="Edit PO"
-                                tone="primary"
-                                className="!p-1"
-                                onClick={() => {
-                                  setEditingPo(po);
-                                  setEditPoOpen(true);
-                                }}
-                              >
-                                <EditIcon sx={{ fontSize: 15 }} />
-                              </IconButton>
-                            )}
 
-                            {/* Receive PO */}
-                            {po.status !== "Received" && po.status !== "Cancelled" && (
+                          {/* Items */}
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-medium" style={{ color: "var(--text-primary)" }} title={po.items.map((i) => i.productName).join(", ")}>
+                              {po.items[0]?.productName}
+                            </div>
+                            <div className="mt-0.5 text-[11px]" style={{ color: "var(--text-tertiary)" }}>
+                              {po.items.length} {po.items.length === 1 ? "item" : "items"} · {qty.toLocaleString("en-IN")} units
+                            </div>
+                            <div className="mt-1.5 flex flex-wrap gap-1.5">
+                              <StatusChip status={po.status} />
+                            </div>
+                          </div>
+
+                          {/* Amount + payment */}
+                          <div className="min-w-0">
+                            <div className="flex items-baseline justify-between gap-2">
+                              <span className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
+                                {formatCurrency(po.totalAmount)}
+                              </span>
+                              <StatusChip status={po.paymentStatus} />
+                            </div>
+                            <div className="mt-2">
+                              <ProgressBar value={pct} tone={pct >= 100 ? "emerald" : "amber"} height="h-1.5" />
+                            </div>
+                            <div className="mt-1 text-[11px]" style={{ color: "var(--text-tertiary)" }}>
+                              {formatCurrency(paid)} paid
+                              {po.totalAmount - paid > 0 && ` · ${formatCurrency(po.totalAmount - paid)} due`}
+                            </div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="flex items-center justify-end gap-0.5">
+                            {open && (
                               <IconButton
-                                label="Mark as Received"
+                                label="Mark as received"
                                 tone="success"
-                                className="!p-1"
                                 onClick={() => {
                                   setSelectedPoForReceive(po);
                                   setReceiveDialogOpen(true);
                                 }}
                               >
-                                <MoveToInboxIcon sx={{ fontSize: 15 }} />
+                                <MoveToInboxIcon sx={{ fontSize: 18 }} />
                               </IconButton>
                             )}
-
-                            {/* Pay */}
-                            {po.paymentStatus !== "Paid" && po.status !== "Cancelled" && (
+                            {canPay && (
                               <IconButton
-                                label="Record Payment"
+                                label="Record payment"
                                 tone="primary"
-                                className="!p-1"
                                 onClick={() => {
                                   setSelectedPoForPay(po);
-                                  setPayAmount(po.totalAmount - (po.paidAmount || 0));
+                                  setPayAmount(po.totalAmount - paid);
                                   setPayDialogOpen(true);
                                 }}
                               >
-                                <PaymentsIcon sx={{ fontSize: 15 }} />
+                                <PaymentsIcon sx={{ fontSize: 18 }} />
                               </IconButton>
                             )}
-
-                            {/* Cancel */}
-                            {po.status !== "Received" && po.status !== "Cancelled" && (
+                            {open && (
+                              <IconButton
+                                label="Edit PO"
+                                tone="primary"
+                                onClick={() => {
+                                  setEditingPo(po);
+                                  setEditPoOpen(true);
+                                }}
+                              >
+                                <EditIcon sx={{ fontSize: 18 }} />
+                              </IconButton>
+                            )}
+                            {open && (
                               <IconButton
                                 label="Cancel PO"
                                 tone="danger"
-                                className="!p-1"
                                 onClick={() => {
                                   setCancellingPo(po);
                                   setCancelPoOpen(true);
                                 }}
                               >
-                                <CancelIcon sx={{ fontSize: 15 }} />
+                                <CancelIcon sx={{ fontSize: 18 }} />
                               </IconButton>
                             )}
+                            <IconButton label="View PO" onClick={() => router.push(`/suppliers-purchases/po/${po.id}`)}>
+                              <ChevronRightIcon sx={{ fontSize: 20 }} />
+                            </IconButton>
                           </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </>
             )}
-          </SectionCard>
+          </Panel>
         </div>
       </div>
 

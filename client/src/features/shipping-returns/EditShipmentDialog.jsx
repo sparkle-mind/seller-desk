@@ -13,7 +13,7 @@ const COURIERS = [
   "Blue Dart",
 ];
 
-const DELIVERY_STATUSES = [
+export const DELIVERY_STATUSES = [
   "Manifest Generated",
   "Ready for Pickup",
   "In Transit",

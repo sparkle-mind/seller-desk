@@ -8,13 +8,11 @@ import { useToast } from "@/components/common/ToastProvider";
 import PageHeader from "@/components/common/PageHeader";
 import StatusChip from "@/components/common/StatusChip";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
-import EditShipmentDialog from "@/features/shipping-returns/EditShipmentDialog";
 import ReturnFormDialog from "@/features/shipping-returns/ReturnFormDialog";
 import ReturnInspectionDialog from "@/features/shipping-returns/ReturnInspectionDialog";
 import RtoFormDialog from "@/features/shipping-returns/RtoFormDialog";
+import ShipmentTracking from "@/features/shipping-returns/ShipmentDetail";
 import {
-  updateShipmentStatus,
-  editShipment,
   editCustomerReturn,
   updateReturnInspection,
   editRtoRecord,
@@ -24,10 +22,8 @@ import { formatCurrency, formatDate, formatDateTime } from "@/lib/formatters";
 
 // MUI
 import Button from "@/components/common/Button";
-import Tooltip from "@mui/material/Tooltip";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import AssignmentReturnIcon from "@mui/icons-material/AssignmentReturn";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -75,165 +71,6 @@ function Timeline({ steps }) {
           <div className="text-[11px] text-slate-500 mt-0.5">{step.desc}</div>
         </div>
       ))}
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   SHIPMENT DETAIL
-═══════════════════════════════════════════════════════════════════ */
-function ShipmentDetail({ shipment }) {
-  const dispatch = useDispatch();
-  const toast = useToast();
-  const router = useRouter();
-  const [editOpen, setEditOpen] = useState(false);
-
-  const handleMarkDelivered = () => {
-    dispatch(updateShipmentStatus({ id: shipment.id, deliveryStatus: "Delivered" }));
-    toast.success("Shipment marked as delivered");
-  };
-
-  const handleEditSubmit = (payload) => {
-    dispatch(editShipment(payload));
-    toast.success("Shipment updated");
-  };
-
-  const deliveryDone = shipment.deliveryStatus === "Delivered";
-  const isCancelled =
-    shipment.deliveryStatus === "Returned to Origin" ||
-    shipment.deliveryStatus === "Cancelled";
-
-  const timelineSteps = [
-    { title: "Manifest Generated", desc: formatDateTime(shipment.shipmentDate), done: true },
-    {
-      title: "Ready for Pickup / In Transit",
-      desc: `Courier: ${shipment.courierName} | AWB: ${shipment.awbNumber || "Pending"}`,
-      done:
-        shipment.deliveryStatus !== "Manifest Generated" &&
-        shipment.deliveryStatus !== "Ready for Pickup",
-      active: shipment.deliveryStatus === "In Transit",
-    },
-    {
-      title: "Out for Delivery",
-      desc: `ETA: ${formatDate(shipment.expectedDeliveryDate)}`,
-      done:
-        shipment.deliveryStatus === "Out for Delivery" ||
-        shipment.deliveryStatus === "Delivered",
-      active: shipment.deliveryStatus === "Out for Delivery",
-    },
-    {
-      title: "Delivered to Customer",
-      desc: shipment.deliveredDate
-        ? `Delivered on ${formatDateTime(shipment.deliveredDate)}`
-        : deliveryDone
-        ? "Delivered"
-        : "Pending delivery",
-      done: deliveryDone,
-    },
-  ];
-
-  return (
-    <div className="space-y-6">
-      <PageHeader
-        title={`Shipment ${shipment.id}`}
-        subtitle={`Order: ${shipment.orderId} | Courier: ${shipment.courierName} | AWB: ${shipment.awbNumber || "Pending"}`}
-        breadcrumbs={[
-          { label: "Shipping & Returns", href: "/shipping-returns" },
-          { label: shipment.id },
-        ]}
-        actions={
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button
-              variant="outline"
-              tone="neutral"
-              startIcon={<ArrowBackIcon />}
-              onClick={() => router.push("/shipping-returns")}
-            >
-              Back
-            </Button>
-            {!deliveryDone && !isCancelled && (
-              <Button
-                tone="success"
-                startIcon={<CheckCircleIcon />}
-                onClick={handleMarkDelivered}
-              >
-                Mark Delivered
-              </Button>
-            )}
-            <Button
-              startIcon={<EditIcon />}
-              onClick={() => setEditOpen(true)}
-            >
-              Edit Shipment
-            </Button>
-          </div>
-        }
-      />
-
-      {/* Status Banner */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-3 flex-wrap">
-          <StatusChip status={shipment.marketplace} />
-          <div className="h-4 w-px bg-slate-200 hidden sm:block" />
-          <div className="flex items-center gap-1.5 text-xs">
-            <span className="text-slate-500">Delivery Status:</span>
-            <StatusChip status={shipment.deliveryStatus} />
-          </div>
-        </div>
-        <div className="text-xs text-slate-500">
-          Shipped: <strong className="text-slate-800">{formatDateTime(shipment.shipmentDate)}</strong>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 cols */}
-        <div className="lg:col-span-2 space-y-6">
-          <SectionCard title="Shipment Details" icon={LocalShippingIcon}>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { label: "Courier", value: shipment.courierName },
-                { label: "AWB Number", value: shipment.awbNumber || "Pending", mono: true },
-                { label: "Destination", value: shipment.destinationCity },
-                { label: "Pincode", value: shipment.pincode, mono: true },
-                { label: "Shipping Cost", value: formatCurrency(shipment.shippingCost) },
-                { label: "Weight", value: `${shipment.weightKg} kg` },
-                { label: "Expected Delivery", value: formatDate(shipment.expectedDeliveryDate) },
-                { label: "Delivered On", value: shipment.deliveredDate ? formatDateTime(shipment.deliveredDate) : "—" },
-              ].map((item, i) => (
-                <div key={i} className="p-3 bg-slate-50 rounded-lg">
-                  <div className="text-[10px] text-slate-400 uppercase tracking-wider">{item.label}</div>
-                  <div className={`font-bold text-slate-900 mt-0.5 text-xs break-all ${item.mono ? "font-mono" : ""}`}>
-                    {item.value}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </SectionCard>
-
-          <SectionCard title="Item Summary" icon={InventoryIcon}>
-            <div className="p-3 bg-slate-50 rounded-lg">
-              <p className="text-sm font-semibold text-slate-800">{shipment.itemsSummary}</p>
-              <p className="text-xs text-slate-500 mt-1">
-                Order ID: <span className="font-mono text-blue-600">{shipment.orderId}</span>
-              </p>
-            </div>
-          </SectionCard>
-        </div>
-
-        {/* Right 1 col: Timeline */}
-        <div>
-          <SectionCard title="Delivery Timeline" icon={InfoOutlinedIcon}>
-            <Timeline steps={timelineSteps} />
-          </SectionCard>
-        </div>
-      </div>
-
-      <EditShipmentDialog
-        open={editOpen}
-        shipment={shipment}
-        onClose={() => setEditOpen(false)}
-        onSubmit={handleEditSubmit}
-      />
     </div>
   );
 }
@@ -587,7 +424,7 @@ export default function ShippingReturnsDetailPage() {
   const returnRecord = returns.find((r) => r.id === id);
   const rto = rtos.find((r) => r.id === id);
 
-  if (shipment) return <ShipmentDetail shipment={shipment} />;
+  if (shipment) return <ShipmentTracking shipment={shipment} />;
   if (returnRecord) return <ReturnDetail returnRecord={returnRecord} />;
   if (rto) return <RtoDetail rto={rto} />;
 

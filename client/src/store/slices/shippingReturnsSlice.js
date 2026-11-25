@@ -47,6 +47,8 @@ const shippingReturnsSlice = createSlice({
       if (shp) {
         if (deliveryStatus) shp.deliveryStatus = deliveryStatus;
         if (deliveryStatus === "Delivered" && !shp.deliveredDate) shp.deliveredDate = new Date().toISOString();
+        // Moving a shipment back to a pre-delivery state drops the stale delivery date.
+        if (deliveryStatus && !deliveryStatus.startsWith("Delivered")) shp.deliveredDate = null;
         if (courierName) shp.courierName = courierName;
         if (awbNumber) shp.awbNumber = awbNumber;
         if (shippingCost !== undefined) shp.shippingCost = Number(shippingCost);
@@ -57,7 +59,10 @@ const shippingReturnsSlice = createSlice({
     editShipment: (state, action) => {
       const idx = state.shipments.findIndex((s) => s.id === action.payload.id);
       if (idx !== -1) {
-        state.shipments[idx] = { ...state.shipments[idx], ...action.payload };
+        const next = { ...state.shipments[idx], ...action.payload };
+        if (next.deliveryStatus && !next.deliveryStatus.startsWith("Delivered")) next.deliveredDate = null;
+        if (next.deliveryStatus === "Delivered" && !next.deliveredDate) next.deliveredDate = new Date().toISOString();
+        state.shipments[idx] = next;
         saveToStorage(SHIPMENTS_KEY, state.shipments);
       }
     },

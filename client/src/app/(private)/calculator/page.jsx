@@ -11,6 +11,7 @@ import DataTable from "@/components/common/DataTable";
 import EmptyState from "@/components/common/EmptyState";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
 import SavedCalculationCard from "@/features/calculator/SavedCalculationCard";
+import DeskCalculator from "@/features/calculator/DeskCalculator";
 import { useToast } from "@/components/common/ToastProvider";
 import {
   saveCalculation,
@@ -319,7 +320,7 @@ export default function CalculatorPage() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* ── Inputs ───────────────────────────────────────── */}
         <section
-          className="lg:col-span-3 rounded-2xl p-4 sm:p-6 space-y-6"
+          className="lg:col-span-3 lg:self-start rounded-2xl p-4 sm:p-6 space-y-6"
           style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-card)" }}
         >
           <div className="flex items-center justify-between gap-3">
@@ -480,9 +481,9 @@ export default function CalculatorPage() {
         </section>
 
         {/* ── Results ──────────────────────────────────────── */}
-        <aside className="lg:col-span-2">
+        <aside className="lg:col-span-2 space-y-6">
           <div
-            className="lg:sticky lg:top-24 rounded-2xl p-4 sm:p-6 space-y-5"
+            className="rounded-2xl p-4 sm:p-6 space-y-5"
             style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border)", boxShadow: "var(--shadow-card)" }}
           >
             <div className="flex items-center gap-2">
@@ -601,6 +602,14 @@ export default function CalculatorPage() {
               </Button>
             </div>
           </div>
+
+          {/* Quick desk calculator for side sums */}
+          <DeskCalculator
+            onApply={(field, value) => {
+              set(field, value);
+              toast.info(field === "sellingPrice" ? "Selling price updated" : "Purchase price updated");
+            }}
+          />
         </aside>
       </div>
 
